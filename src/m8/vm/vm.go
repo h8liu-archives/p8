@@ -7,17 +7,20 @@ import (
 var enc = binary.LittleEndian
 
 const (
-	AddressError = iota
+	ExpNone = iota
+	ExpHalt
+	ExpAddr
+	ExpPC
 )
 
-type Core struct {
-	gprs   []uint32
-	hi, lo uint32
-	pc     uint32
-	mem    []byte
+type C struct {
+	gprs []uint32
+	pc   uint32
+	mem  []byte
+	exp  int
 }
 
-func (self *Core) NewCore(memSize int) *Core {
+func NewC(memSize int) *C {
 	if memSize%1024 != 0 {
 		panic("memory not aligned to 1024")
 	}
@@ -25,231 +28,356 @@ func (self *Core) NewCore(memSize int) *Core {
 		panic("zero memory")
 	}
 
-	ret := new(Core)
-	ret.gprs = make([]uint32, 32)
+	ret := new(C)
+	ret.gprs = make([]uint32, 16)
 	ret.mem = make([]byte, memSize)
 
 	return ret
 }
 
-func (self *Core) w(i int, v uint32) {
+func (c *C) chkpc() bool {
+	a := c.pc
+	if a&0x3 != 0 {
+		c.expaddr()
+		return false
+	}
+	if a+4 > c.memlen() {
+		c.expaddr()
+		return false
+	}
+	return true
+}
+
+func (c *C) Run(start uint32) {
+	c.pc = start
+	c.exp = ExpNone
+
+	for c.exp == ExpNone {
+		if !c.chkpc() {
+			break
+		}
+
+		inst := c.rdw(c.pc)
+		c.pc += 4
+
+		if (inst >> 28) != 0 {
+			c.i28(inst)
+		} else if (inst >> 24) != 0 {
+			c.i24(inst)
+		} else if (inst >> 16) != 0 {
+			c.i16(inst)
+		} else if (inst >> 12) != 0 {
+			c.i12(inst)
+		} else if (inst >> 8) != 0 {
+			c.i8(inst)
+		} else if (inst >> 4) != 0 {
+			c.i4(inst)
+		} else {
+			c.i0(inst)
+		}
+	}
+}
+
+func (c *C) i28(i uint32) {
+	if (i >> 30) == 1 {
+		c.j(i)
+	}
+	if (i >> 30) == 2 {
+		c.jal(i)
+	}
+	if (i >> 28) == 1 {
+		c.syscall(i & 0x0fffffff)
+	}
+}
+
+func (c *C) i24(inst uint32) {
+	x := uint8(inst & 0xf)
+	y := uint8((inst >> 4) & 0xf)
+	i := uint16(inst >> 8)
+	code := uint8((inst >> 24) & 0xf)
+	switch code {
+	case 1:
+		c.addi(x, y, i)
+	case 2:
+		c.andi(x, y, i)
+	case 3:
+		c.ori(x, y, i)
+	case 4:
+		c.slti(x, y, i)
+	case 5:
+		c.lw(x, y, i)
+	case 6:
+		c.lh(x, y, i)
+	case 7:
+		c.lhu(x, y, i)
+	case 8:
+		c.lb(x, y, i)
+	case 9:
+		c.lbu(x, y, i)
+	case 10:
+		c.sw(x, y, i)
+	case 11:
+		c.sh(x, y, i)
+	case 12:
+		c.sb(x, y, i)
+	case 13:
+		c.beq(x, y, i)
+	case 14:
+		c.bne(x, y, i)
+	}
+}
+
+func (c *C) i20(inst uint32) {
+	x := uint8(inst & 0xf)
+	i := uint16(inst >> 4)
+	code := uint8((inst >> 24) & 0xf)
+	switch code {
+	case 1:
+		c.lui(x, i)
+	}
+}
+
+func (c *C) i16(inst uint32) {
+	x := uint8(inst & 0xf)
+	y := uint8((inst >> 4) & 0xf)
+	p := uint8((inst >> 8) & 0xf)
+	q := uint8((inst >> 12) & 0xf)
+	code := uint8((inst >> 16) & 0xf)
+
+	switch code {
+	case 1:
+		c.mul(x, y, p, q)
+	case 2:
+		c.mulu(x, y, p, q)
+	case 3:
+		c.div(x, y, p, q)
+	case 4:
+		c.divu(x, y, p, q)
+	}
+}
+
+func (c *C) i12(inst uint32) {
+	x := uint8(inst & 0xf)
+	y := uint8((inst >> 4) & 0xf)
+	z := uint8((inst >> 8) & 0xf)
+	code := uint8((inst >> 12) & 0xf)
+
+	switch code {
+	case 1:
+		c.add(x, y, z)
+	case 2:
+		c.sub(x, y, z)
+	case 3:
+		c.and(x, y, z)
+	case 4:
+		c.or(x, y, z)
+	case 5:
+		c.xor(x, y, z)
+	case 6:
+		c.nor(x, y, z)
+	case 7:
+		c.slt(x, y, z)
+	case 8:
+		c.sll(x, y, z)
+	case 9:
+		c.srl(x, y, z)
+	case 10:
+		c.sra(x, y, z)
+	case 11:
+		c.sllv(x, y, z)
+	case 12:
+		c.srlv(x, y, z)
+	case 13:
+		c.srav(x, y, z)
+	}
+}
+
+func (c *C) i8(inst uint32) {}
+
+func (c *C) i4(inst uint32) {
+	x := uint8(inst & 0xf)
+	code := uint8((inst >> 4) & 0xf)
+	switch code {
+	case 1:
+		c.jr(x)
+	}
+}
+
+func (c *C) i0(inst uint32) {
+	code := uint8(inst & 0xf)
+	switch code {
+	case 0:
+		c.halt()
+	}
+}
+
+func (c *C) w(i uint8, v uint32) {
 	if i == 0 {
 		return
 	}
-	self.gprs[i] = v
+	c.gprs[i] = v
 }
-
-func (self *Core) r(i int) uint32 {
+func (c *C) r(i uint8) uint32 {
 	if i == 0 {
 		return 0
 	}
-	return self.gprs[i]
+	return c.gprs[i]
 }
-
-func (self *Core) trap(t uint32) { panic("todo") }
-
-func (c *Core) Addu(d, s, t int) { c.w(d, c.r(s)+c.r(t)) }
-func (c *Core) Subu(d, s, t int) { c.w(d, c.r(s)-c.r(t)) }
-
-func (c *Core) Addiu(t, s int, C uint16) { c.w(t, c.r(s)+signExt(C)) }
-
-func (c *Core) Mult(s, t int) {
-	r := uint64(int64(c.r(s)) * int64(c.r(t)))
-	c.lo = uint32(r)
-	c.hi = uint32(r >> 32)
-}
-
-func (c *Core) Multu(s, t int) {
-	r := uint64(c.r(s)) * uint64(c.r(t))
-	c.lo = uint32(r)
-	c.hi = uint32(r >> 32)
-}
-
-func (c *Core) Div(s, t int) {
-	_s := int32(c.r(s))
-	_t := int32(c.r(t))
-	if _t == 0 {
-		c.lo = 0
-		c.hi = 0
-		return
-	}
-	c.lo = uint32(_s / _t)
-	c.hi = uint32(_s % _t)
-}
-
-func (c *Core) Divu(s, t int) {
-	_s := c.r(s)
-	_t := c.r(t)
-	if _t == 0 {
-		c.lo = 0
-		c.hi = 0
-		return
-	}
-	c.lo = _s / _t
-	c.hi = _s % _t
-}
-
-func (c *Core) word(addr uint32) uint32 {
-	return enc.Uint32(c.mem[addr : addr+4])
-}
-
-func (c *Core) halfWord(addr uint32) uint16 {
-	return enc.Uint16(c.mem[addr : addr+4])
-}
-
-func (c *Core) writeWord(addr uint32, v uint32) {
-	enc.PutUint32(c.mem[addr:addr+4], v)
-}
-
-func (c *Core) writeHalfWord(addr uint32, v uint16) {
-	enc.PutUint16(c.mem[addr:addr+2], v)
-}
-
-func (c *Core) writeByte(addr uint32, v uint8) {
-	c.mem[addr] = v
-}
-
-func (c *Core) checkWordAddr(addr uint32) bool {
-	return (addr&0x2) == 0 && addr+4 <= c.memLen()
-}
-
-func (c *Core) checkHalfWordAddr(addr uint32) bool {
-	return (addr&0x1) == 0 && addr+2 <= c.memLen()
-}
-
-func (c *Core) checkAddr(addr uint32) bool {
-	return addr < c.memLen()
-}
-
-func (c *Core) memLen() uint32 { return uint32(len(c.mem)) }
-
-func signExt(C uint16) uint32 { return uint32(int32(int16(C))) }
-
-func (c *Core) Lw(t, s int, C uint16) {
-	addr := c.r(s) + signExt(C)
-	if !c.checkWordAddr(addr) {
-		c.trap(AddressError)
-		return
-	}
-
-	c.w(t, c.word(addr))
-}
-
-func (c *Core) Lh(t, s int, C uint16) {
-	addr := c.r(s) + signExt(C)
-	if !c.checkHalfWordAddr(addr) {
-		c.trap(AddressError)
-		return
-	}
-
-	c.w(t, uint32(int32(int16(c.halfWord(addr)))))
-}
-
-func (c *Core) Lhu(t, s int, C uint16) {
-	addr := c.r(s) + signExt(C)
-	if !c.checkHalfWordAddr(addr) {
-		c.trap(AddressError)
-		return
-	}
-
-	c.w(t, uint32(c.halfWord(addr)))
-}
-
-func (c *Core) Lb(t, s int, C uint16) {
-	addr := c.r(s) + signExt(C)
-	if !c.checkAddr(addr) {
-		c.trap(AddressError)
-		return
-	}
-
-	c.w(t, uint32(int32(int8(c.mem[addr]))))
-}
-
-func (c *Core) Lbu(t, s int, C uint16) {
-	addr := c.r(s) + signExt(C)
-	if !c.checkAddr(addr) {
-		c.trap(AddressError)
-		return
-	}
-
-	c.w(t, uint32(c.mem[addr]))
-}
-
-func (c *Core) Sw(t, s int, C uint16) {
-	addr := c.r(s) + signExt(C)
-	if !c.checkWordAddr(addr) {
-		c.trap(AddressError)
-		return
-	}
-
-	c.writeWord(addr, c.r(t))
-}
-
-func (c *Core) Sh(t, s int, C uint16) {
-	addr := c.r(s) + signExt(C)
-	if !c.checkHalfWordAddr(addr) {
-		c.trap(AddressError)
-		return
-	}
-
-	c.writeHalfWord(addr, uint16(c.r(t)))
-}
-
-func (c *Core) Sb(t, s int, C uint16) {
-	addr := c.r(s) + signExt(C)
-	if !c.checkAddr(addr) {
-		c.trap(AddressError)
-		return
-	}
-
-	c.writeByte(addr, uint8(c.r(t)))
-}
-
-func (c *Core) Mfhi(d int) { c.w(d, c.hi) }
-func (c *Core) Mflo(d int) { c.w(d, c.lo) }
-
-func (c *Core) And(d, s, t int)         { c.w(d, c.r(s)&c.r(t)) }
-func (c *Core) Andi(t, s int, C uint16) { c.w(t, c.r(s)&uint32(C)) }
-func (c *Core) Or(d, s, t int)          { c.w(d, c.r(s)|c.r(t)) }
-func (c *Core) Ori(t, s int, C uint16)  { c.w(t, c.r(s)|uint32(C)) }
-func (c *Core) Xor(d, s, t int)         { c.w(d, c.r(s)^c.r(d)) }
-func (c *Core) Nor(d, s, t int)         { c.w(d, ^(c.r(s) | c.r(d))) }
-
+func (c *C) rs(i uint8) int32    { return int32(c.r(i)) }
+func (c *C) ws(i uint8, v int32) { c.w(i, uint32(v)) }
 func bin(c bool) uint32 {
 	if c {
 		return 1
 	}
 	return 0
 }
+func (c *C) trap(t uint32)   { panic("trap") }
+func (c *C) expaddr() uint32 { c.trap(ExpAddr); return 0 }
+func (c *C) memlen() uint32  { return uint32(len(c.mem)) }
 
-func (c *Core) Slt(d, s, t int) { c.w(d, bin(int32(c.r(s)) < int32(c.r(t)))) }
-func (c *Core) Slti(t, s int, C uint16) {
-	c.w(t, bin(int32(c.r(s)) < int32(signExt(C))))
+// i0: 0000 000c
+func (c *C) halt() { c.trap(ExpHalt) }
+
+// i4: 0000 00cx
+func (c *C) jr(x uint8) { c.pc = c.r(x) }
+
+// i12: 0000 czyx
+func (c *C) add(x, y, z uint8)  { c.w(x, c.r(y)+c.r(z)) }
+func (c *C) sub(x, y, z uint8)  { c.w(x, c.r(y)-c.r(z)) }
+func (c *C) and(x, y, z uint8)  { c.w(x, c.r(y)&c.r(z)) }
+func (c *C) or(x, y, z uint8)   { c.w(x, c.r(y)|c.r(z)) }
+func (c *C) xor(x, y, z uint8)  { c.w(x, c.r(y)^c.r(z)) }
+func (c *C) nor(x, y, z uint8)  { c.w(x, ^(c.r(y) | c.r(z))) }
+func (c *C) slt(x, y, z uint8)  { c.w(x, bin(c.r(y) < c.r(z))) }
+func (c *C) sll(x, y, z uint8)  { c.w(x, c.r(y)<<z) }
+func (c *C) srl(x, y, z uint8)  { c.w(x, c.r(y)>>z) }
+func (c *C) sra(x, y, z uint8)  { c.ws(x, c.rs(y)>>z) }
+func (c *C) sllv(x, y, z uint8) { c.w(x, c.r(y)<<c.r(z)) }
+func (c *C) srlv(x, y, z uint8) { c.w(x, c.r(y)>>c.r(z)) }
+func (c *C) srav(x, y, z uint8) { c.ws(x, c.rs(y)>>c.r(z)) }
+
+// i16: 000c pqyx
+func (c *C) mul(x, y, p, q uint8) {
+	_p, _q := c.rs(p), c.rs(q)
+	m := uint64(int64(_p) * int64(_q))
+	c.ws(x, int32(m>>32))
+	c.ws(y, int32(m&0xffffffff))
+}
+func (c *C) mulu(x, y, p, q uint8) {
+	_p, _q := c.r(p), c.r(q)
+	m := uint64(_p) * uint64(_q)
+	c.w(x, uint32(m>>32))
+	c.w(y, uint32(m&0xffffffff))
+}
+func (c *C) div(x, y, p, q uint8) {
+	_p, _q := c.rs(p), c.rs(q)
+	if _q == 0 {
+		c.ws(x, 0)
+		c.ws(y, 0)
+		return
+	}
+	c.ws(x, _p/_q)
+	c.ws(y, _p%_q)
 }
 
-func (c *Core) Sll(d, t, s int)  { c.w(d, c.r(t)<<uint(s)) }
-func (c *Core) Srl(d, t, s int)  { c.w(d, c.r(t)>>uint(s)) }
-func (c *Core) Sra(d, t, s int)  { c.w(d, uint32(int32(c.r(t))>>uint(s))) }
-func (c *Core) Sllv(d, t, s int) { c.w(d, c.r(t)<<c.r(s)) }
-func (c *Core) Srlv(d, t, s int) { c.w(d, c.r(t)>>c.r(s)) }
-func (c *Core) Srav(d, t, s int) { c.w(d, uint32(int32(c.r(t))>>c.r(s))) }
-
-func (c *Core) relPC(C uint16) uint32 {
-	return c.pc + uint32(4*int32(signExt(C)))
+func (c *C) divu(x, y, p, q uint8) {
+	_p, _q := c.r(p), c.r(q)
+	if _q == 0 {
+		c.ws(x, 0)
+		c.ws(y, 0)
+		return
+	}
+	c.w(x, _p/_q)
+	c.w(y, _p%_q)
 }
 
-func (c *Core) Beq(s, t int, C uint16) {
-	if c.r(s) == c.r(t) {
-		c.pc = c.relPC(C)
+// i20: 00ci iiix
+
+func se(c uint16) int32  { return int32(int16(c)) }
+func ze(c uint16) uint32 { return uint32(c) }
+func seb(c uint8) int32  { return int32(int8(c)) }
+func zeb(c uint8) uint32 { return uint32(c) }
+
+func (c *C) lui(x uint8, i uint16) {
+	c.w(x, c.r(x)&0x0000ffff+(ze(i)<<16))
+}
+
+// i24: 0cii iiyx
+
+func (c *C) addr(y uint8, i uint16) uint32 {
+	return uint32(c.rs(y) + se(i))
+}
+func (c *C) adw(y uint8, i uint16) uint32 {
+	a := c.addr(y, i)
+	if a&0x3 != 0 {
+		return c.expaddr()
+	}
+	if a+4 > c.memlen() {
+		return c.expaddr()
+	}
+	return a
+}
+func (c *C) adhw(y uint8, i uint16) uint32 {
+	a := c.addr(y, i)
+	if a&0x1 != 0 {
+		return c.expaddr()
+	}
+	if a+2 > c.memlen() {
+		return c.expaddr()
+	}
+	return a
+}
+
+func (c *C) adb(y uint8, i uint16) uint32 {
+	a := c.addr(y, i)
+	if a >= c.memlen() {
+		return c.expaddr()
+	}
+	return a
+}
+
+func (c *C) rdw(a uint32) uint32  { return enc.Uint32(c.mem[a : a+4]) }
+func (c *C) rdhw(a uint32) uint16 { return enc.Uint16(c.mem[a : a+2]) }
+func (c *C) rdb(a uint32) uint8   { return c.mem[a] }
+
+func (c *C) wrw(a uint32, v uint32)  { enc.PutUint32(c.mem[a:a+4], v) }
+func (c *C) wrhw(a uint32, v uint16) { enc.PutUint16(c.mem[a:a+4], v) }
+func (c *C) wrb(a uint32, v uint8)   { c.mem[a] = v }
+
+func (c *C) addi(x, y uint8, i uint16) { c.ws(x, c.rs(y)+se(i)) }
+func (c *C) andi(x, y uint8, i uint16) { c.w(x, c.r(y)&ze(i)) }
+func (c *C) ori(x, y uint8, i uint16)  { c.w(x, c.r(y)|ze(i)) }
+func (c *C) slti(x, y uint8, i uint16) { c.w(x, bin(c.rs(y) < se(i))) }
+
+func (c *C) lw(x, y uint8, i uint16)  { c.w(x, c.rdw(c.adw(y, i))) }
+func (c *C) lh(x, y uint8, i uint16)  { c.ws(x, se(c.rdhw(c.adhw(y, i)))) }
+func (c *C) lhu(x, y uint8, i uint16) { c.w(x, ze(c.rdhw(c.adhw(y, i)))) }
+func (c *C) lb(x, y uint8, i uint16)  { c.ws(x, seb(c.rdb(c.adb(y, i)))) }
+func (c *C) lbu(x, y uint8, i uint16) { c.w(x, zeb(c.rdb(c.adb(y, i)))) }
+
+func (c *C) sw(x, y uint8, i uint16) { c.wrw(c.adw(y, i), c.r(x)) }
+func (c *C) sh(x, y uint8, i uint16) { c.wrhw(c.adhw(y, i), uint16(c.r(x))) }
+func (c *C) sb(x, y uint8, i uint16) { c.wrb(c.adb(y, i), uint8(c.r(x))) }
+
+func (c *C) beq(x, y uint8, i uint16) {
+	if c.r(x) == c.r(y) {
+		c.pc += uint32(se(i)) << 2
+	}
+}
+func (c *C) bne(x, y uint8, i uint16) {
+	if c.r(x) != c.r(y) {
+		c.pc += uint32(se(i)) << 2
 	}
 }
 
-func (c *Core) Bne(s, t int, C uint16) {
-	if c.r(s) != c.r(t) {
-		c.pc = c.relPC(C)
-	}
-}
+// i28: xiii iiii
 
-func (c *Core) J(C uint32)   { c.pc = (c.pc & 0xfc000000) + (C & 0x03ffffff) }
-func (c *Core) Jr(s int)     { c.pc = c.r(s) }
-func (c *Core) Jal(C uint32) { c.w(31, c.pc); c.J(C) }
+// x = 01ii
+func (c *C) j(i uint32) { c.pc = i << 2 }
+
+// x = 10ii
+func (c *C) jal(i uint32) { c.w(15, c.pc); c.j(i) }
+
+// x = 0001
+func (c *C) syscall(i uint32) { /* todo */
+}
