@@ -1,6 +1,9 @@
-package vm
+package m8
 
 import (
+	"fmt"
+	"io"
+
 	"encoding/binary"
 )
 
@@ -20,7 +23,7 @@ type C struct {
 	exp  int
 }
 
-func NewC(memSize int) *C {
+func NewVM(memSize int) *C {
 	if memSize%1024 != 0 {
 		panic("memory not aligned to 1024")
 	}
@@ -231,7 +234,7 @@ func bin(c bool) uint32 {
 	}
 	return 0
 }
-func (c *C) trap(t uint32)   { panic("trap") }
+func (c *C) trap(t int)      { c.exp = t }
 func (c *C) expaddr() uint32 { c.trap(ExpAddr); return 0 }
 func (c *C) memlen() uint32  { return uint32(len(c.mem)) }
 
@@ -380,4 +383,23 @@ func (c *C) jal(i uint32) { c.w(15, c.pc); c.j(i) }
 
 // x = 0001
 func (c *C) syscall(i uint32) { /* todo */
+}
+
+func (c *C) Load(m []byte, offset uint32) {
+	n := uint32(len(m))
+	copy(c.mem[offset:offset+n], m[:n])
+}
+
+func (c *C) PrintRegs(out io.Writer) {
+	fmt.Fprintf(out, "pc=%08x", c.pc)
+
+	for i := uint8(0); i < 16; i++ {
+		if i%4 == 0 {
+			fmt.Fprintln(out)
+		} else {
+			fmt.Fprint(out, " ")
+		}
+		fmt.Fprintf(out, "$%x=%08x", i, c.r(i))
+	}
+	fmt.Fprintln(out)
 }
