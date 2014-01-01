@@ -52,6 +52,6 @@ $0 is always 0
 14. bne if (x!=y) pc+=se(i)<<2
 
 // i28: ciii iiii
-0001. syscall (parameters)
-01ii. j pc=i<<2
-10ii. jal $15=pc; pc=i<<2
+- 0001 syscall (parameters)
+- 01ii. j pc=i<<2
+- 10ii. jal $15=pc; pc=i<<2
