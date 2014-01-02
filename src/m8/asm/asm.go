@@ -1,4 +1,4 @@
-package m8
+package asm
 
 func AssembleFile(path string) []byte {
 	return []byte{}

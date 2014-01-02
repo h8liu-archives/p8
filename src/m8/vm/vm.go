@@ -1,4 +1,4 @@
-package m8
+package vm
 
 import (
 	"fmt"
@@ -16,14 +16,17 @@ const (
 	ExpPC
 )
 
+// the virtual machine
 type C struct {
 	gprs []uint32
 	pc   uint32
 	mem  []byte
 	exp  int
+
+	tsc uint64
 }
 
-func NewVM(memSize int) *C {
+func New(memSize int) *C {
 	if memSize%1024 != 0 {
 		panic("memory not aligned to 1024")
 	}
@@ -53,32 +56,42 @@ func (c *C) chkpc() bool {
 
 func (c *C) Run(start uint32) {
 	c.pc = start
+	c.tsc = 0
+	c.Resume()
+}
+
+func (c *C) Resume() {
 	c.exp = ExpNone
-
 	for c.exp == ExpNone {
-		if !c.chkpc() {
-			break
-		}
-
-		inst := c.rdw(c.pc)
-		c.pc += 4
-
-		if (inst >> 28) != 0 {
-			c.i28(inst)
-		} else if (inst >> 24) != 0 {
-			c.i24(inst)
-		} else if (inst >> 16) != 0 {
-			c.i16(inst)
-		} else if (inst >> 12) != 0 {
-			c.i12(inst)
-		} else if (inst >> 8) != 0 {
-			c.i8(inst)
-		} else if (inst >> 4) != 0 {
-			c.i4(inst)
-		} else {
-			c.i0(inst)
-		}
+		c.step()
 	}
+}
+
+func (c *C) step() {
+	if !c.chkpc() {
+		return
+	}
+
+	inst := c.rdw(c.pc)
+	c.pc += 4
+
+	if (inst >> 28) != 0 {
+		c.i28(inst)
+	} else if (inst >> 24) != 0 {
+		c.i24(inst)
+	} else if (inst >> 16) != 0 {
+		c.i16(inst)
+	} else if (inst >> 12) != 0 {
+		c.i12(inst)
+	} else if (inst >> 8) != 0 {
+		c.i8(inst)
+	} else if (inst >> 4) != 0 {
+		c.i4(inst)
+	} else {
+		c.i0(inst)
+	}
+
+	c.tsc++
 }
 
 func (c *C) i28(i uint32) {
@@ -382,7 +395,8 @@ func (c *C) j(i uint32) { c.pc = i << 2 }
 func (c *C) jal(i uint32) { c.w(15, c.pc); c.j(i) }
 
 // x = 0001
-func (c *C) syscall(i uint32) { /* todo */
+func (c *C) syscall(i uint32) {
+	/* todo */
 }
 
 func (c *C) Load(m []byte, offset uint32) {
@@ -402,4 +416,7 @@ func (c *C) PrintRegs(out io.Writer) {
 		fmt.Fprintf(out, "$%x=%08x", i, c.r(i))
 	}
 	fmt.Fprintln(out)
+	fmt.Fprintf(out, "tsc=%d\n", c.tsc)
 }
+
+func (c *C) ClearTSC() { c.tsc = 0 }
