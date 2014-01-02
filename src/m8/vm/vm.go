@@ -63,13 +63,13 @@ func (c *C) Run(start uint32) {
 func (c *C) Resume() {
 	c.exp = ExpNone
 	for c.exp == ExpNone {
-		c.step()
+		c.Step()
 	}
 }
 
-func (c *C) step() {
+func (c *C) Step() int {
 	if !c.chkpc() {
-		return
+		return c.exp
 	}
 
 	inst := c.rdw(c.pc)
@@ -92,6 +92,8 @@ func (c *C) step() {
 	}
 
 	c.tsc++
+
+	return c.exp
 }
 
 func (c *C) i28(i uint32) {
