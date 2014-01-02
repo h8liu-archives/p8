@@ -429,3 +429,4 @@ func (c *C) PrintRegs(out io.Writer) {
 }
 
 func (c *C) ClearTSC() { c.tsc = 0 }
+func (c *C) TSC() uint64 { return c.tsc }
