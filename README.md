@@ -72,7 +72,7 @@ looking into it for a while, I gave up.
 First, it (seems) does not come with an instruction counter. Although this
 might be easy to add.
 
-Second, it it already pretty complicated. Lua 5.x has around 30000 lines of C
+Second, it it already pretty complicated. Lua 5.x has around 20000 lines of C
 code, which is not easy to understand and reason. This is what I hate about
 large softwares, they evolve over time, and becomes a large pile of code that
 tangled together, and it is normally impossible to just use part of the code
