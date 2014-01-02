@@ -54,7 +54,7 @@ func (c *C) chkpc() bool {
 	return true
 }
 
-func (c *C) Run(start uint32) {
+func (c *C) Run(start uint32) int {
 	c.pc = start
 	c.tsc = 0
 	return c.Resume()
@@ -71,11 +71,10 @@ func (c *C) Resume() int {
 
 func (c *C) Step() int {
 	c.exp = ExpNone
-	c.step()
-	return c.exp
+	return c.step()
 }
 
-func (c *C) step() {
+func (c *C) step() int {
 	if !c.chkpc() {
 		return c.exp
 	}
