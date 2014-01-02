@@ -64,5 +64,22 @@ single-threaded program written in C(or any other popular language) and run it
 in a sandbox. Over these years, I continue searching for an SDK like this but
 fails. 
 
-I think Lua might have some hope on this. I might look at Lua first, see if 
-I can add an instruction counter and related API.
+**Why not just use Lua?**
+
+Lua might be the mature environment that best fits my requirements, but after
+looking into it for a while, I gave up.
+
+First, it (seems) does not come with an instruction counter. Although this
+might be easy to add.
+
+Second, it it already pretty complicated. Lua 5.x has around 30000 lines of C
+code, which is not easy to understand and reason. This is what I hate about
+large softwares, they evolve over time, and becomes a large pile of code that
+tangled together, and it is normally impossible to just use part of the code
+for working because it is not well modularized. Even if it is, the modular
+structure is usually implicit, inter-module interfaces are often now well-defined, 
+and hence hard for a third person to understand it completely and use just part
+of it to work with something new.
+
+So I think I will just start from scratch and see if I can do a better job on
+writing human understandable programs.
