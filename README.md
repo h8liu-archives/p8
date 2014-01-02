@@ -1,1 +1,68 @@
-shh...
+**What is `m8`**
+
+I am still brainstorming on this, but basically I want to build a simple
+Virtual machine. It does not need to be all from scratch, but it needs to be
+simple enough that I can understand how it works exactly.
+
+Computer systems today are huge and complex, and even as a senior PhD student
+on sysnet/networks computer science, I only understand how things work in
+general concepturally, yet always feel like I have no idea how it works in
+details. This often makes me uncomfortable, in several ways.
+
+First is security. Lots of security features are essentially based on merely
+trust on the implementations. However, when trust is gone for some reasons,
+it is practically impossible to check and verity the features, since the
+implementations are often complex and hard to understand. Even with open source
+programs, the source can be easily too complicate to reason about. Instead of
+open, what we really need here is understandable source programs.
+
+Second is education. Schools and universities teach simple concepts on
+architecturs, compilers, operating systems, networks, and students writes toy
+programs based on the teaching materials in separate courses. None of these
+toys work together as a complete system that students can understand how they
+really interacts. Then the students are thrown to real systems which are much
+more complex and impossible to understand the whole picture.
+
+Third is research. Research is about proposing and validating prototype ideas
+with scientific evaluation. However, experiments and benchmarks on real systems
+are just hard to repeat becauss modern computers are complex and depends on all
+kinds of random factors. As a result, when evaluating new research ideas, every
+researcher just build its own benchmark setup and how that others believe the
+results validates the idea. 
+
+Final one is personal. I need to tell a story for this. 
+
+When I was in collage, I was once in charge of developing a platform for an
+annual game AI competition. The competition goes like this: every year, a small
+group of organizers (often tech nerd students like me) design a simple game
+(often based ancient games like PacMan, Tetris, etc.), while every participants
+submits an AI for the game. All the AIs run in a realtime gaming arena based on
+the game rules, compete for the winning prices. Almost every year, a new but
+imperfect game AI arena is developed. Sometimes the inter-procedure
+communication was based on linking DLLs files, sometimes based on pipes, and
+sometimes on networks links. However, since it is always based on existing
+operating systems environment (a.k.a. Windows), fariness on computational
+resource allocation has always been a problem, especially when the game
+approaches the finals and heats up. Since cycles allocated to each AIs are
+limited, a really competitive AI often wants to squeeze all the cycles
+available, but at the same time can easily miss the action deadline if it is
+not careful, and from the arena platform side, providing a real-time API that
+can tell the API how many cycles is in its pocket is very hard in most
+non-realtime OS runtimes, not saying to guarantee fairness among different
+running AIs. If it was using DLLs running on the same machine, an AI might miss
+an action deadline due to scheduling gitters; if it was running on separate
+machines, an AI might miss the deadline due to network latencies. Now imagine
+the final comes, two AIs compete for the throne, and one extremely powerful AI
+misses an action deadline on a critical movement and lose the game; this
+actually happened.
+
+I blame the platform for this issue, and when I was in charge on implementing
+this, I always wanted to fix that, but find it very hard to fix perfectly. It
+becomes one of my complexes. It sounds like a feature request that is so
+simple: allocate a certain but hard number of CPU cycles, memory spaces to a
+single-threaded program written in C(or any other popular language) and run it
+in a sandbox. Over these years, I continue searching for an SDK like this but
+fails. 
+
+I think Lua might have some hope on this. I might look at Lua first, see if 
+I can add an instruction counter and related API.
