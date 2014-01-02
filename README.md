@@ -78,7 +78,7 @@ large softwares, they evolve over time, and becomes a large pile of code that
 tangled together, and it is normally impossible to just use part of the code
 to work with something new because it is not well modularized. Even if it is,
 the modular structure is usually implicit, inter-module interfaces are often
-now well-defined, and hence hard for a third person to understand it completely
+not well-defined, and hence hard for a third person to understand it completely
 and use just part of it to work with something new.
 
 So I think I will just start from scratch and see if I can do a better job on
