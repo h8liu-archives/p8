@@ -1,3 +1,17 @@
+**Something New**
+
+So I just see run into some documents talking about how to write a LLVM 
+backend for CPU0, which is a very simple ISA. So, it might be just easier
+in the end to just write a simmulator for CPU0 (or something similar), and
+then we can leverage the large chunk of LLVM stuff, and compile C programs.
+
+Another way I am thinking about is to port tcc (A Tiny C Compiler), try to
+understand the code and rewrite it in my favourite golang, and by then, I will
+have a full fledged compiler that I can say that I understand how it works.
+
+Neither way has a huge learning curve, but comparing with the developing effort
+of writing a compiler from scratch, it might be worth trying.
+
 **What is `m8`**
 
 I am still brainstorming on this, but basically I want to build a simple
