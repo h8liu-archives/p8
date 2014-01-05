@@ -42,9 +42,13 @@ func (vm *VM) step() int {
 	return vm.exp
 }
 
-func (vm *VM) Run(start uint64) int {
+func (vm *VM) Restart(start uint64) int {
+	vm.ClearTSC()
+	return vm.ResumeAt(start)
+}
+
+func (vm *VM) ResumeAt(start uint64) int {
 	vm.pc = start
-	vm.tsc = 0
 	return vm.Resume()
 }
 
@@ -60,6 +64,11 @@ func (vm *VM) Resume() int {
 func (vm *VM) Step() int {
 	vm.exp = ExcepNone
 	return vm.step()
+}
+
+func (vm *VM) StepAt(start uint64) int {
+	vm.pc = start
+	return vm.Step()
 }
 
 func (vm *VM) Load(m []byte, offset uint64) {
