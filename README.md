@@ -35,3 +35,9 @@ The goal of the project is build a simple virtual world where all its code
 pieces are easy to understand, reasonn about and reuse. Code quality is over
 everything. Performance and size optimizations are almost always the last 
 things that need to consider.
+
+So, basically, this is like a mime-craft game for a CS SysNet PhD (hopefully
+more meaningful than other computer games that ends up with absolutely
+nothing). 
+
+If you are also interested, please email me. liulonnie@gmail.com
