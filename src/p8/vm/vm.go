@@ -2,14 +2,14 @@ package vm
 
 // the virtual machine
 type VM struct {
-	r  []uint64
-	pc uint64
+	r []uint64
 
-	e uint64
-	tsc uint64
-	ttl uint64
+	pc  uint64
+	TSC uint64
+	TTL uint64
 
 	mem []byte
+	e   uint64
 }
 
 func New(memSize int) *VM {
@@ -32,10 +32,10 @@ func (vm *VM) except(e uint64) {
 }
 
 func (vm *VM) tick() {
-	vm.tsc++
-	if vm.ttl > 0 {
-		vm.ttl--
-		if vm.ttl == 0 {
+	vm.TSC++
+	if vm.TTL > 0 {
+		vm.TTL--
+		if vm.TTL == 0 {
 			vm.except(ExcepDeath)
 		}
 	}
@@ -56,11 +56,6 @@ func (vm *VM) step() uint64 {
 	vm.tick()
 
 	return vm.e
-}
-
-func (vm *VM) Restart(start uint64) uint64 {
-	vm.ClearTSC()
-	return vm.ResumeAt(start)
 }
 
 func (vm *VM) ResumeAt(start uint64) uint64 {
@@ -95,8 +90,5 @@ func (vm *VM) Load(m []byte, offset uint64) {
 	copy(vm.mem[offset:offset+n], m[:n])
 }
 
-func (vm *VM) ClearTSC() { vm.tsc = 0 }
-
-func (vm *VM) PC() uint64       { return vm.pc }
-func (vm *VM) TSC() uint64      { return vm.tsc }
 func (vm *VM) R(a uint8) uint64 { return vm.r[a] }
+func (vm *VM) PC() uint64       { return vm.pc }
