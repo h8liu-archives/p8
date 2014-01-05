@@ -6,7 +6,7 @@ import (
 
 func (vm *VM) inst(i uint64) {
 	op := i >> 48
-	r := vm.gprs
+	r := vm.r
 	if (op & J) != 0 {
 		vm.pc = i << 3
 		if (op & Jal) != 0 {
@@ -21,7 +21,7 @@ func (vm *VM) inst(i uint64) {
 }
 
 func (vm *VM) inst0(i uint64) {
-	r := vm.gprs
+	r := vm.r
 
 	op := i >> 48
 	x := (i >> 44) & 0xf

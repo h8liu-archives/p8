@@ -1,14 +1,9 @@
 package vm
 
-import (
-	"fmt"
-	"io"
-)
-
 // the virtual machine
 type VM struct {
-	gprs []uint64
-	pc   uint64
+	r  []uint64
+	pc uint64
 
 	exp int
 	tsc uint64
@@ -25,7 +20,7 @@ func New(memSize int) *VM {
 	}
 
 	ret := new(VM)
-	ret.gprs = make([]uint64, 16)
+	ret.r = make([]uint64, 16)
 	ret.mem = make([]byte, memSize)
 
 	return ret
@@ -40,7 +35,7 @@ func (vm *VM) step() int {
 	vm.inst(i)
 
 	// clean up
-	vm.gprs[0] = 0
+	vm.r[0] = 0
 	u64p(vm.mem[0:8], 0)
 	vm.tsc++
 
@@ -75,21 +70,8 @@ func (vm *VM) Load(m []byte, offset uint64) {
 	copy(vm.mem[offset:offset+n], m[:n])
 }
 
-func (vm *VM) PrintRegs(out io.Writer) {
-	fmt.Fprintf(out, "pc=%016x", vm.pc)
-	r := vm.gprs
+func (vm *VM) ClearTSC() { vm.tsc = 0 }
 
-	for i := uint8(0); i < 16; i++ {
-		if i%4 == 0 {
-			fmt.Fprintln(out)
-		} else {
-			fmt.Fprint(out, " ")
-		}
-		fmt.Fprintf(out, "$%x=%016x", i, r[i])
-	}
-	fmt.Fprintln(out)
-	fmt.Fprintf(out, "tsc=%d\n", vm.tsc)
-}
-
-func (vm *VM) VMlearTSVM()  { vm.tsc = 0 }
-func (vm *VM) TSVM() uint64 { return vm.tsc }
+func (vm *VM) PC() uint64       { return vm.pc }
+func (vm *VM) TSC() uint64      { return vm.tsc }
+func (vm *VM) R(a uint8) uint64 { return vm.r[a] }
