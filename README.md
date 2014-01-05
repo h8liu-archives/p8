@@ -16,7 +16,7 @@ is in fact not that tiny anyway. I personally prefer tcc somehow because that
 allows you to have control on everything, rather than sit on a large chunk
 of modules that you don't (and probably never going to) understand how it works.
 
-**What is `m8`**
+**What is `p8`**
 
 I am still brainstorming on this, but basically I want to build a simple
 Virtual machine. It does not need to be all from scratch, but it needs to be

@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"m8/asm"
-	"m8/vm"
+	"p8/asm"
+	"p8/vm"
 )
 
 func main() {
