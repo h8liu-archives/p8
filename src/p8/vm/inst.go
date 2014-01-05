@@ -1,11 +1,15 @@
 package vm
 
+import (
+	. "p8/risc"
+)
+
 func (c *C) inst(i uint32) {
 	op := uint8(i >> 24)
 	r := c.gprs
-	if (op & _j) != 0 {
+	if (op & J) != 0 {
 		c.pc = i << 2
-		if (op & _jal) != 0 {
+		if (op & Jal) != 0 {
 			r[15] = c.pc
 		}
 	} else {
@@ -27,52 +31,52 @@ func (c *C) regInst(i uint32) {
 	q := i & 0xf
 
 	switch op {
-	case halt:
+	case Halt:
 		c.exp = ExpHalt
-	case jr:
+	case Jr:
 		c.pc = r[p]
-	case add:
+	case Add:
 		r[x] = r[p] + r[q]
-	case sub:
+	case Sub:
 		r[x] = r[p] - r[q]
-	case and:
+	case And:
 		r[x] = r[p] & r[q]
-	case or:
+	case Or:
 		r[x] = r[p] | r[q]
-	case xor:
+	case Xor:
 		r[x] = r[p] ^ r[q]
-	case nor:
+	case Nor:
 		r[x] = ^(r[p] | r[q])
-	case slt:
+	case Slt:
 		r[x] = _slt(r[p], r[q])
-	case sll:
+	case Sll:
 		r[x] = r[p] << q
-	case srl:
+	case Srl:
 		r[x] = r[p] >> q
-	case sra:
+	case Sra:
 		r[x] = uint32(int32(r[p]) >> q)
-	case sllv:
+	case Sllv:
 		r[x] = r[p] << r[q]
-	case srlv:
+	case Srlv:
 		r[x] = r[p] >> r[q]
-	case srav:
+	case Srav:
 		r[x] = uint32(int32(r[p]) >> r[q])
-	case mul:
+	case Mul:
 		t := int64(r[p]) * int64(r[q])
 		r[x] = uint32(int32(t >> 32))
 		r[y] = uint32(t)
-	case mulu:
+	case Mulu:
 		t := uint64(r[p]) * uint64(r[q])
 		r[x] = uint32(t >> 32)
 		r[y] = uint32(t)
-	case div:
+	case Div:
 		if r[q] == 0 {
 			r[x], r[y] = 0, 0
 		} else {
 			r[x] = r[p] / r[q]
 			r[x] = r[p] % r[q]
 		}
-	case divu:
+	case Divu:
 		_p := int32(r[p])
 		_q := int32(r[q])
 		if _q == 0 {
@@ -95,37 +99,37 @@ func (c *C) immedInst(i uint32) {
 	ad := r[y] + uint32(ims)
 
 	switch op {
-	case addi:
+	case Addi:
 		r[x] = r[y] + imu
-	case andi:
+	case Andi:
 		r[x] = r[y] & imu
-	case ori:
+	case Ori:
 		r[x] = r[y] | imu
-	case slti:
+	case Slti:
 		r[x] = _slt(r[y], imu)
-	case lw:
+	case Lw:
 		r[x] = c.rdw(ad)
-	case lh:
+	case Lh:
 		r[x] = uint32(c.rdh(ad))
-	case lhu:
+	case Lhu:
 		r[x] = uint32(se(c.rdh(ad)))
-	case lb:
+	case Lb:
 		r[x] = uint32(seb(c.rdb(ad)))
-	case lbu:
+	case Lbu:
 		r[x] = uint32(c.rdb(ad))
-	case lui:
+	case Lui:
 		r[x] = (imu << 16) + (r[x] & 0xffff)
-	case sw:
+	case Sw:
 		c.wrw(ad, r[x])
-	case sh:
+	case Sh:
 		c.wrh(ad, uint16(r[x]))
-	case sb:
+	case Sb:
 		c.wrb(ad, uint8(r[x]))
-	case beq:
+	case Beq:
 		if r[x] == r[y] {
 			c.pc += uint32(ims) << 2
 		}
-	case bne:
+	case Bne:
 		if r[x] != r[y] {
 			c.pc += uint32(ims) << 2
 		}
