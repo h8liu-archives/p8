@@ -41,4 +41,4 @@ So, basically, this is like a minecraft game for a CS SysNet PhD (hopefully
 more meaningful than other computer games that ends up with absolutely
 nothing). 
 
-If you are also interested, please email me. liulonnie@gmail.com
+If you are also interested and want to help, please contact me. liulonnie@gmail.com
