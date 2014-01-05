@@ -11,7 +11,7 @@ So, basically, this is like a minecraft game for a CS SysNet PhD (hopefully
 more insteresting and meaningful than those other computer games that ends up
 with absolutely nothing). 
 
-**Plan**
+**plan (tentative)**
 
 Design new arch and languages:
 
