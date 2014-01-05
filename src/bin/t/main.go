@@ -29,8 +29,12 @@ func PrintRegs(vm *vm.VM) { FprintRegs(os.Stdout, vm) }
 func main() {
 	v := vm.New(4096 * 8)                   // 8 pages
 	v.Load(asm.AssembleFile("a.asm"), 4096) // load at page 1
-	v.Restart(4096)
+
+	e := v.Restart(4096)
+	fmt.Printf("e=%d\n", e)
 	PrintRegs(v)
-	v.Resume()
+
+	e = v.Resume()
+	fmt.Printf("e=%d\n", e)
 	PrintRegs(v)
 }

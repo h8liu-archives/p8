@@ -36,7 +36,7 @@ func (vm *VM) inst0(i uint64) {
 	switch op {
 	// system
 	case Halt:
-		vm.exp = ExcepHalt
+		vm.except(ExcepHalt)
 	case Rdtsc:
 		r[x] = vm.tsc
 

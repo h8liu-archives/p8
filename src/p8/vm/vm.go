@@ -5,8 +5,9 @@ type VM struct {
 	r  []uint64
 	pc uint64
 
-	exp int
+	e uint64
 	tsc uint64
+	ttl uint64
 
 	mem []byte
 }
@@ -26,7 +27,21 @@ func New(memSize int) *VM {
 	return ret
 }
 
-func (vm *VM) step() int {
+func (vm *VM) except(e uint64) {
+	vm.e |= e
+}
+
+func (vm *VM) tick() {
+	vm.tsc++
+	if vm.ttl > 0 {
+		vm.ttl--
+		if vm.ttl == 0 {
+			vm.except(ExcepDeath)
+		}
+	}
+}
+
+func (vm *VM) step() uint64 {
 	// read
 	i := vm.rdd(vm.pc)
 	vm.pc += 8
@@ -37,36 +52,37 @@ func (vm *VM) step() int {
 	// clean up
 	vm.r[0] = 0
 	u64p(vm.mem[0:8], 0)
-	vm.tsc++
 
-	return vm.exp
+	vm.tick()
+
+	return vm.e
 }
 
-func (vm *VM) Restart(start uint64) int {
+func (vm *VM) Restart(start uint64) uint64 {
 	vm.ClearTSC()
 	return vm.ResumeAt(start)
 }
 
-func (vm *VM) ResumeAt(start uint64) int {
+func (vm *VM) ResumeAt(start uint64) uint64 {
 	vm.pc = start
 	return vm.Resume()
 }
 
-func (vm *VM) Resume() int {
-	vm.exp = ExcepNone
-	for vm.exp == ExcepNone {
+func (vm *VM) Resume() uint64 {
+	vm.e = 0
+	for vm.e == 0 {
 		vm.step()
 	}
 
-	return vm.exp
+	return vm.e
 }
 
-func (vm *VM) Step() int {
-	vm.exp = ExcepNone
+func (vm *VM) Step() uint64 {
+	vm.e = 0
 	return vm.step()
 }
 
-func (vm *VM) StepAt(start uint64) int {
+func (vm *VM) StepAt(start uint64) uint64 {
 	vm.pc = start
 	return vm.Step()
 }

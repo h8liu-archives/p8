@@ -1,7 +1,7 @@
 package vm
 
 const (
-	ExcepNone = iota
-	ExcepHalt
+	ExcepHalt = 1 << iota
 	ExcepAddr
+	ExcepDeath
 )
