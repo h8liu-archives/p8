@@ -39,6 +39,8 @@ func (vm *VM) inst0(i uint64) {
 		vm.except(ExcepHalt)
 	case Rdtsc:
 		r[x] = vm.tsc
+	case Rdttl:
+		r[x] = vm.ttl
 
 	// calculation
 	case Add:

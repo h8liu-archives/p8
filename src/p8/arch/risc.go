@@ -3,8 +3,10 @@ Package arch defines the op code for P8 RISC architecture.
 
 A P8 CPU has a PC register and 16 64-bit registers. Register $0 is always 0.
 
-It also has a 64-bit time stamp counter (TSC) that increases by 1 every cycle.
-In the simulator, TSC (might) increase by 1 every instruction.
+It also has a 64-bit time stamp counter (TSC) read-only reg that increases by 1
+every cycle, and a 64-bit time to live (TTL) read-only reg that decreases by 1
+every cycle if it is not zero already.  In the simulator, both registers
+(might) change by 1 every instruction.
 
 Address length is also 64-bit. On memory alignment error or invalid
 errors, the machine halts. Memory space is virtual, split into 4K pages. A page
@@ -37,6 +39,7 @@ package risc
 const (
 	Halt  = iota // halt
 	Rdtsc        // x = tsc
+	Rdttl        // x = ttl
 )
 
 // calculations
