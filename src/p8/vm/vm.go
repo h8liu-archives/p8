@@ -54,8 +54,8 @@ func (c *C) Run(start uint64) int {
 }
 
 func (c *C) Resume() int {
-	c.exp = ExpNone
-	for c.exp == ExpNone {
+	c.exp = ExcepNone
+	for c.exp == ExcepNone {
 		c.step()
 	}
 
@@ -63,7 +63,7 @@ func (c *C) Resume() int {
 }
 
 func (c *C) Step() int {
-	c.exp = ExpNone
+	c.exp = ExcepNone
 	return c.step()
 }
 

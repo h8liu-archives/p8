@@ -4,7 +4,7 @@ func (c *C) ad(a uint64, n uint) uint64 {
 	// TODO: page handling
 	ad := (a >> n) << n
 	if ad != a {
-		c.exp = ExpAddr
+		c.exp = ExcepAddr
 	}
 	return ad
 }

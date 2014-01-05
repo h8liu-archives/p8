@@ -36,7 +36,7 @@ func (c *C) inst0(i uint64) {
 	switch op {
 	// system
 	case Halt:
-		c.exp = ExpHalt
+		c.exp = ExcepHalt
 	case Rdtsc:
 		r[x] = c.tsc
 
