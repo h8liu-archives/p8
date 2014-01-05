@@ -2,56 +2,56 @@
 
 16 32bit registers
 $0 is always 0
+// regs
+// 0ccc xypq
+0000. halt
+0001. jr pc=p
+0002. add x=p+q
+0003. sub x=p-q 
+0004. and x=p&q
+0005. or  x=p|q
+0006. xor x=p^q
+0007. nor x=^(p|q)
+0008. slt x=p<q
+0009. sll x=p<<!q
+000A. srl x=p>>!q
+000B. sra x=p>>!q // signed
+000C. sllv x=p<<q
+000D. srlv x=p>>q
+000E. srav x=p>>q // signed
+000F. // reserved
 
-// i0: 0000 000c
-0. halt
+0010. mul  [x;y]=p*q // signed
+0011. mulu [x;y]=p*q // unsigned
+0012. div  (x,y)=(p/q,p%q) // signed
+0013. divu (x,y)=(p/q,p%q) // unsigned
 
-// i4: 0000 00cx
-1. jr pc=x
+// immediates
+// 1cxy iiii
+10xy. addi x=y+se(i)
+11xy. andi x=y&ze(i)
+12xy. ori  x=y|ze(i)
+13xy. slti x=y<se(i)
+14xy. lw   x=[y+se(i)]
+15xy. lh  x=[y+se(i)] // signed
+16xy. lhu x=[y+se(i)]
+17xy. lb  x=[y+se(i)] // signed
+18xy. lbu x=[y+se(i)]
+19xy. lui x=ze(i) << 16
+1Axy. sw  [y+se(i)]=x
+1Bxy. sh [y+se(i)]=x
+1Cxy. sb [y+se(i)]=x
+1Dxy. beq if (x==y) pc+=se(i)<<2
+1Exy. bne if (x!=y) pc+=se(i)<<2
 
-// i8: 0000 0cyx
+// fpus // reserved
+// 2... ....
 
-// i12: 0000 czyx
-1. add x=y+z
-2. sub x=y-z 
-3. and x=y&z
-4. or  x=y|z
-5. xor x=y^z
-6. nor x=^(y|z)
-7. slt x=y<z
-8. sll x=y<<!z
-9. srl x=y>>!z
-10. sra x=y>>!z // signed
-11. sllv x=y<<z
-12. srlv x=y>>z
-13. srav x=y>>z // signed
+// syscall, ios // reserved
+// 3... ....
 
-// i16: 000c qpyx
-1. mul  [xy]=p*q // signed
-2. mulu [xy]=p*q
-3. div  (x,y)=(p/q,p%q) // signed
-4. divu (x,y)=(p/q,p/q)
+// reserved
+// (4-7)
 
-// i20: 00ci iiix
-1. lui x=ze(i) << 16
-
-// i24: 0cii iiyx
-1. addi x=y+se(i)
-2. andi x=y&ze(i)
-3. ori  x=y|ze(i)
-4. slti x=y<se(i)
-5. ld   x=[y+se(i)]
-6. ldh  x=[y+se(i)] // signed
-7. ldhu x=[y+se(i)]
-8. ldb  x=[y+se(i)] // signed
-9. ldbu x=[y+se(i)]
-10. st  [y+se(i)]=x
-11. sth [y+se(i)]=x
-12. stb [y+se(i)]=x
-13. beq if (x==y) pc+=se(i)<<2
-14. bne if (x!=y) pc+=se(i)<<2
-
-// i28: ciii iiii
-- 0001 syscall (parameters)
-- 01ii. j pc=i<<2
-- 10ii. jal $15=pc; pc=i<<2
+// (8-B) j pc=I<<2
+// (C-F) jal $15=pc; pc=I<<2
