@@ -14,18 +14,17 @@ All memory accesses must be proper aligned.
 
 P8 is little endian.
 
-Each instruction is 64-bit long. The highest 16 bits is the opcode. It is a
-jump when the highest bit of the opcode is 1, the jump will save the PC in $15
-if the second highest bit of the opcode is also 1. For details of the opcode,
-see comments of the opcode definitions.
+Each instruction is 64-bit long. The highest 16 bits is the opcode. The
+instruction is a jump when the highest bit of the opcode is 1, the jump will
+save the PC in $15 if the second highest bit of the opcode is also 1. For
+details of the opcode, see comments of the opcode definitions.
 
 TODO: In the future, it also will support 64-bit floating point calculations.
 
 There is no ring protection or interrupt handling mechanisms within a VM.
 
 TODO: Processes will be put in separate VMs, VMs communicates via register
-based messages and shared pages. A page can be mapped to multiple VMs, but only
-one VM can write.
+based messages and shared pages. So yes, a page can be mapped to multiple VMs.
 
 TODO: VM0 is the kernel VM. It listens on all kinds of system events (by default),
 and manage other VMs via system calls (open, kill, pause, resume, map memory,
@@ -34,12 +33,14 @@ executable. When VM0 halts, the machine halts.
 */
 package risc
 
-// Register based instructions
-// Format in hex: 0... xypq iiii iiii
+// system
 const (
 	Halt  = iota // halt
 	Rdtsc        // x = tsc
+)
 
+// calculations
+const (
 	Add  = 0x100 + iota // x = p + q
 	Addi                // x = y + signed(i)
 	Sub                 // x = p - q
@@ -58,16 +59,25 @@ const (
 	Sllv                // x = p << q
 	Srlv                // x = p >> q, unsigned
 	Srav                // x = p >> q, signed
+)
 
+// jumps
+const (
 	Jr  = 0x200 + iota // pc = p
 	Beq                // if x == y, pc += signed(i)*8
 	Bne                // if x != y, pc += signed(i)*8
+)
 
+// muls and divs
+const (
 	Mul  = 0x300 + iota // x = p * q, signed
 	Mulu                // x = p * q, unsigned
 	Div                 // (x, y) = (p / q, p % q), signed
 	Divu                // (x, y) = (p / q, p % q), unsigned
+)
 
+// memory ops
+const (
 	Ld  = 0x400 + iota // x = [y + signed(i)], double word
 	Lw                 // x = [y + signed(i)], signed word
 	Lwu                // x = [y + signed(i)], unsigned word
@@ -81,8 +91,7 @@ const (
 	Sb                 // [y + signed(i)] = x, byte
 )
 
-// Jump intstructions (opcode >= 0x80)
-// Format in hex: j... .... .... ...., where j=8-F
+// immediate jumps
 const (
 	J   = 0x8000 // pc = I<<3
 	Jal = 0x4000 // $15=pc, pc = I<<3
