@@ -2,10 +2,12 @@
 
 The project plan to construct a simple virtual computer.
 
-The goal of the project is to build a simple virtual world where all its code
-pieces are easy to understand, reasonn about and reuse. Code quality is over
-everything. Performance and size optimizations are almost always the last 
-things that need to consider.
+The goal of the project, if any, is to build a simple virtual world where all
+its code pieces are modularized, easy to understand, reason about and hence
+easy to maintain and reuse. In other words, code quality is over everything,
+all code pieces should present crystal clear human-understandable logic.
+Performance and size optimizations are almost always the last things that need
+to consider.
 
 So, basically, this is like a minecraft game for a CS SysNet PhD (hopefully
 more insteresting and meaningful than those other computer games that ends up
@@ -38,5 +40,7 @@ rewrite everything above in G language.)
 
 I know this project just sounds crazy... so please don't expect me to finish it
 in 100 years.
+
+**recruitement**
 
 If you are also interested and want to help, please contact me. liulonnie@gmail.com
