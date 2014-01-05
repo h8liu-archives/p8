@@ -4,13 +4,12 @@ The project plan to construct a simple virtual computer.
 
 New Languages:
 
-- p8 is register-based machine that runs a simple RISC ISA
+- p8 is a register-based machine that runs a simple RISC ISA
 - i8 is an SSA-like intermediate representation for a compiler
 - G is a high-level programming language
 
 Parts that will be writen in Go language:
 
-- `p8/sys` a small system layer that all other code may use
 - `p8/vm` a simulator for p8
 - `p8/asm` a p8 assembler and deassembler
 - `p8/i8` an i8 interpreter
@@ -34,4 +33,5 @@ This project just sounds crazy... so please don't expect me to finish it...
 
 The goal of the project is build a simple virtual world where all its code
 pieces are easy to understand, reasonn about and reuse. Code quality is over
-everything.
+everything. Performance and size optimizations are almost always the last 
+things that need to consider.
