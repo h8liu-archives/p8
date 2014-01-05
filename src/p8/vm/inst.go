@@ -1,7 +1,7 @@
 package vm
 
 import (
-	. "p8/risc"
+	. "p8/arch"
 )
 
 func (c *C) inst(i uint64) {

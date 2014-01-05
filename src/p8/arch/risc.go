@@ -1,5 +1,5 @@
 /*
-Package risc defines the op code for P8 RISC architecture.
+Package arch defines the op code for P8 RISC architecture.
 
 A P8 CPU has a PC register and 16 64-bit registers. Register $0 is always 0.
 
