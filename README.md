@@ -2,13 +2,24 @@
 
 The project plan to construct a simple virtual computer.
 
-New Languages:
+The goal of the project is to build a simple virtual world where all its code
+pieces are easy to understand, reasonn about and reuse. Code quality is over
+everything. Performance and size optimizations are almost always the last 
+things that need to consider.
+
+So, basically, this is like a minecraft game for a CS SysNet PhD (hopefully
+more meaningful than other computer games that ends up with absolutely
+nothing). 
+
+**Plan**
+
+Design new arch and languages:
 
 - p8 is a register-based machine that runs a simple RISC ISA
 - i8 is an SSA-like intermediate representation for a compiler
 - G is a high-level programming language
 
-Parts that will be writen in Go language:
+Write some code for the new arch and languages:
 
 - `p8/vm` a simulator for p8
 - `p8/dasm` a p8 deassembler
@@ -21,24 +32,11 @@ Parts that will be writen in Go language:
 - `p8/cc` a full-fledged C compiler, compile to p8 via i8
 - `p8/goc` a full-fledged golang compiler, compile to p8 via i8
 
-Parts that will be writen in G language:
-
-- `g/sys` a thin system layer to use in p8 machine, like an OS
-
 At this time, all the previous code written in go language should be able to
-port into p8 framework without modification.
+port into p8 framework without modification. (An alternative plan could be
+rewrite everything above in G language.)
 
-An alternative plan could be rewrite everything above in G language
-
-This project just sounds crazy... so please don't expect me to finish it...
-
-The goal of the project is build a simple virtual world where all its code
-pieces are easy to understand, reasonn about and reuse. Code quality is over
-everything. Performance and size optimizations are almost always the last 
-things that need to consider.
-
-So, basically, this is like a minecraft game for a CS SysNet PhD (hopefully
-more meaningful than other computer games that ends up with absolutely
-nothing). 
+I know this project just sounds crazy... so please don't expect me to finish it
+in 100 years.
 
 If you are also interested and want to help, please contact me. liulonnie@gmail.com
