@@ -11,7 +11,8 @@ New Languages:
 Parts that will be writen in Go language:
 
 - `p8/vm` a simulator for p8
-- `p8/asm` a p8 assembler and deassembler
+- `p8/dasm` a p8 deassembler
+- `p8/asm` a p8 assembler
 - `p8/i8` an i8 interpreter
 - `p8/i8c` a compiler from i8 to p8
 - `p8/gc` a compiler from G to p8 via i8
