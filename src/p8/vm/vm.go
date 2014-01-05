@@ -8,23 +8,34 @@ type VM struct {
 	TSC uint64
 	TTL uint64
 
-	mem []byte
-	e   uint64
+	pages map[uint64]*Page
+	e     uint64
 }
 
-func New(memSize int) *VM {
-	if memSize%1024 != 0 {
-		panic("memory not aligned to 1K")
-	}
-	if memSize == 0 {
-		panic("zero memory")
-	}
-
+func New(p1 *Page) *VM {
 	ret := new(VM)
 	ret.r = make([]uint64, 16)
-	ret.mem = make([]byte, memSize)
+	ret.pages = make(map[uint64]*Page)
+	if p1 != nil {
+		ret.MapPage(1, p1)
+	}
 
 	return ret
+}
+
+func (vm *VM) MapPage(pos uint64, p *Page) {
+	if pos == 0 {
+		return
+	}
+
+	if p == nil {
+		if vm.pages[pos] != nil {
+			delete(vm.pages, pos)
+		}
+		return
+	}
+
+	vm.pages[pos] = p
 }
 
 func (vm *VM) except(e uint64) {
@@ -43,7 +54,7 @@ func (vm *VM) tick() {
 
 func (vm *VM) step() uint64 {
 	// read
-	i := vm.rdd(vm.pc)
+	i := vm.rdInst()
 	vm.pc += 8
 
 	// exec
@@ -51,7 +62,6 @@ func (vm *VM) step() uint64 {
 
 	// clean up
 	vm.r[0] = 0
-	u64p(vm.mem[0:8], 0)
 
 	vm.tick()
 
@@ -80,14 +90,6 @@ func (vm *VM) Step() uint64 {
 func (vm *VM) StepAt(start uint64) uint64 {
 	vm.pc = start
 	return vm.Step()
-}
-
-func (vm *VM) Load(m []byte, offset uint64) {
-	if offset%8 != 0 {
-		panic("offset not aligned")
-	}
-	n := uint64(len(m))
-	copy(vm.mem[offset:offset+n], m[:n])
 }
 
 func (vm *VM) R(a uint8) uint64 { return vm.r[a] }

@@ -1,30 +1,35 @@
 package vm
 
-func (vm *VM) ad(a uint64, n uint) uint64 {
-	// TODO: page handling
+func (vm *VM) ad(a uint64, n uint, perm uint64) []byte {
 	ad := (a >> n) << n
+
 	if ad != a {
 		vm.except(ExcepAddr)
+		return nil
 	}
-	return ad
+
+	p := vm.pages[a>>PageOffset]
+	if p == nil {
+		vm.except(ExcepAddr)
+		return nil
+	}
+
+	if !p.HavePerm(perm) {
+		vm.except(ExcepMemPerm)
+		return nil
+	}
+
+	return p.S(a, 1<<n)
 }
 
-func (vm *VM) _rdd(a uint64) uint64 { return u64(vm.mem[a : a+8]) }
-func (vm *VM) _rdw(a uint64) uint32 { return u32(vm.mem[a : a+4]) }
-func (vm *VM) _rdh(a uint64) uint16 { return u16(vm.mem[a : a+2]) }
-func (vm *VM) _rdb(a uint64) uint8  { return vm.mem[a] }
+func (vm *VM) rdInst() uint64 { return u64(vm.ad(vm.pc, 3, PermExec)) }
 
-func (vm *VM) _wrd(a uint64, v uint64) { u64p(vm.mem[a:a+8], v) }
-func (vm *VM) _wrw(a uint64, v uint32) { u32p(vm.mem[a:a+4], v) }
-func (vm *VM) _wrh(a uint64, v uint16) { u16p(vm.mem[a:a+4], v) }
-func (vm *VM) _wrb(a uint64, v uint8)  { vm.mem[a] = v }
+func (vm *VM) rdd(a uint64) uint64 { return u64(vm.ad(a, 3, 0)) }
+func (vm *VM) rdw(a uint64) uint32 { return u32(vm.ad(a, 2, 0)) }
+func (vm *VM) rdh(a uint64) uint16 { return u16(vm.ad(a, 1, 0)) }
+func (vm *VM) rdb(a uint64) uint8  { return vm.ad(a, 0, 0)[0] }
 
-func (vm *VM) rdd(a uint64) uint64 { return vm._rdd(vm.ad(a, 3)) }
-func (vm *VM) rdw(a uint64) uint32 { return vm._rdw(vm.ad(a, 2)) }
-func (vm *VM) rdh(a uint64) uint16 { return vm._rdh(vm.ad(a, 1)) }
-func (vm *VM) rdb(a uint64) uint8  { return vm._rdb(vm.ad(a, 0)) }
-
-func (vm *VM) wrd(a uint64, v uint64) { vm._wrd(vm.ad(a, 3), v) }
-func (vm *VM) wrw(a uint64, v uint32) { vm._wrw(vm.ad(a, 2), v) }
-func (vm *VM) wrh(a uint64, v uint16) { vm._wrh(vm.ad(a, 1), v) }
-func (vm *VM) wrb(a uint64, v uint8)  { vm._wrb(vm.ad(a, 0), v) }
+func (vm *VM) wrd(a uint64, v uint64) { u64p(vm.ad(a, 3, PermWrite), v) }
+func (vm *VM) wrw(a uint64, v uint32) { u32p(vm.ad(a, 2, PermWrite), v) }
+func (vm *VM) wrh(a uint64, v uint16) { u16p(vm.ad(a, 1, PermWrite), v) }
+func (vm *VM) wrb(a uint64, v uint8)  { vm.ad(a, 0, PermWrite)[0] = v }

@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 
-	"p8/asm"
 	"p8/vm"
 )
 
@@ -27,10 +26,9 @@ func FprintRegs(out io.Writer, vm *vm.VM) {
 func PrintRegs(vm *vm.VM) { FprintRegs(os.Stdout, vm) }
 
 func main() {
-	v := vm.New(4096 * 8)                   // 8 pages
-	v.Load(asm.AssembleFile("a.asm"), 4096) // load at page 1
+	v := vm.New(vm.NewPage(vm.PermAll)) // 8 pages
 
-	e := v.ResumeAt(4096)
+	e := v.ResumeAt(vm.PageStart(1))
 	fmt.Printf("e=%d\n", e)
 	PrintRegs(v)
 
