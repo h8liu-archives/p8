@@ -6,7 +6,7 @@ import (
 )
 
 // the virtual machine
-type C struct {
+type VM struct {
 	gprs []uint64
 	pc   uint64
 
@@ -16,7 +16,7 @@ type C struct {
 	mem []byte
 }
 
-func New(memSize int) *C {
+func New(memSize int) *VM {
 	if memSize%1024 != 0 {
 		panic("memory not aligned to 1K")
 	}
@@ -24,60 +24,60 @@ func New(memSize int) *C {
 		panic("zero memory")
 	}
 
-	ret := new(C)
+	ret := new(VM)
 	ret.gprs = make([]uint64, 16)
 	ret.mem = make([]byte, memSize)
 
 	return ret
 }
 
-func (c *C) step() int {
+func (vm *VM) step() int {
 	// read
-	i := c.rdd(c.pc)
-	c.pc += 8
+	i := vm.rdd(vm.pc)
+	vm.pc += 8
 
 	// exec
-	c.inst(i)
+	vm.inst(i)
 
 	// clean up
-	c.gprs[0] = 0
-	u64p(c.mem[0:8], 0)
-	c.tsc++
+	vm.gprs[0] = 0
+	u64p(vm.mem[0:8], 0)
+	vm.tsc++
 
-	return c.exp
+	return vm.exp
 }
 
-func (c *C) Run(start uint64) int {
-	c.pc = start
-	c.tsc = 0
-	return c.Resume()
+func (vm *VM) Run(start uint64) int {
+	vm.pc = start
+	vm.tsc = 0
+	return vm.Resume()
 }
 
-func (c *C) Resume() int {
-	c.exp = ExcepNone
-	for c.exp == ExcepNone {
-		c.step()
+func (vm *VM) Resume() int {
+	vm.exp = ExcepNone
+	for vm.exp == ExcepNone {
+		vm.step()
 	}
 
-	return c.exp
+	return vm.exp
 }
 
-func (c *C) Step() int {
-	c.exp = ExcepNone
-	return c.step()
+func (vm *VM) Step() int {
+	vm.exp = ExcepNone
+	return vm.step()
 }
 
-func (c *C) Load(m []byte, offset uint64) {
+func (vm *VM) Load(m []byte, offset uint64) {
 	if offset%8 != 0 {
 		panic("offset not aligned")
 	}
 	n := uint64(len(m))
-	copy(c.mem[offset:offset+n], m[:n])
+	copy(vm.mem[offset:offset+n], m[:n])
 }
 
-func (c *C) PrintRegs(out io.Writer) {
-	fmt.Fprintf(out, "pc=%016x", c.pc)
-	r := c.gprs
+func (vm *VM) PrintRegs(out io.Writer) {
+	fmt.Fprintf(out, "pc=%016x", vm.pc)
+	r := vm.gprs
 
 	for i := uint8(0); i < 16; i++ {
 		if i%4 == 0 {
@@ -88,8 +88,8 @@ func (c *C) PrintRegs(out io.Writer) {
 		fmt.Fprintf(out, "$%x=%016x", i, r[i])
 	}
 	fmt.Fprintln(out)
-	fmt.Fprintf(out, "tsc=%d\n", c.tsc)
+	fmt.Fprintf(out, "tsc=%d\n", vm.tsc)
 }
 
-func (c *C) ClearTSC()   { c.tsc = 0 }
-func (c *C) TSC() uint64 { return c.tsc }
+func (vm *VM) VMlearTSVM()  { vm.tsc = 0 }
+func (vm *VM) TSVM() uint64 { return vm.tsc }

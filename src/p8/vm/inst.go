@@ -4,24 +4,24 @@ import (
 	. "p8/arch"
 )
 
-func (c *C) inst(i uint64) {
+func (vm *VM) inst(i uint64) {
 	op := i >> 48
-	r := c.gprs
+	r := vm.gprs
 	if (op & J) != 0 {
-		c.pc = i << 3
+		vm.pc = i << 3
 		if (op & Jal) != 0 {
-			r[15] = c.pc
+			r[15] = vm.pc
 		}
 	} else {
 		switch op >> 12 {
 		case 0:
-			c.inst0(i)
+			vm.inst0(i)
 		}
 	}
 }
 
-func (c *C) inst0(i uint64) {
-	r := c.gprs
+func (vm *VM) inst0(i uint64) {
+	r := vm.gprs
 
 	op := i >> 48
 	x := (i >> 44) & 0xf
@@ -36,9 +36,9 @@ func (c *C) inst0(i uint64) {
 	switch op {
 	// system
 	case Halt:
-		c.exp = ExcepHalt
+		vm.exp = ExcepHalt
 	case Rdtsc:
-		r[x] = c.tsc
+		r[x] = vm.tsc
 
 	// calculation
 	case Add:
@@ -80,14 +80,14 @@ func (c *C) inst0(i uint64) {
 
 	// control flow
 	case Jr:
-		c.pc = r[p]
+		vm.pc = r[p]
 	case Beq:
 		if r[x] == r[y] {
-			c.pc += uint64(ims) << 2
+			vm.pc += uint64(ims) << 2
 		}
 	case Bne:
 		if r[x] != r[y] {
-			c.pc += uint64(ims) << 2
+			vm.pc += uint64(ims) << 2
 		}
 
 	// mul and div
@@ -114,26 +114,26 @@ func (c *C) inst0(i uint64) {
 
 	// memory
 	case Ld:
-		r[x] = c.rdd(ad)
+		r[x] = vm.rdd(ad)
 	case Lw:
-		r[x] = uint64(sew(c.rdw(ad)))
+		r[x] = uint64(sew(vm.rdw(ad)))
 	case Lwu:
-		r[x] = uint64(c.rdh(ad))
+		r[x] = uint64(vm.rdh(ad))
 	case Lh:
-		r[x] = uint64(seh(c.rdh(ad)))
+		r[x] = uint64(seh(vm.rdh(ad)))
 	case Lhu:
-		r[x] = uint64(c.rdh(ad))
+		r[x] = uint64(vm.rdh(ad))
 	case Lb:
-		r[x] = uint64(seb(c.rdb(ad)))
+		r[x] = uint64(seb(vm.rdb(ad)))
 	case Lbu:
-		r[x] = uint64(c.rdb(ad))
+		r[x] = uint64(vm.rdb(ad))
 	case Sd:
-		c.wrd(ad, r[x])
+		vm.wrd(ad, r[x])
 	case Sw:
-		c.wrw(ad, uint32(r[x]))
+		vm.wrw(ad, uint32(r[x]))
 	case Sh:
-		c.wrh(ad, uint16(r[x]))
+		vm.wrh(ad, uint16(r[x]))
 	case Sb:
-		c.wrb(ad, uint8(r[x]))
+		vm.wrb(ad, uint8(r[x]))
 	}
 }
