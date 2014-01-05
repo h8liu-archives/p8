@@ -1,6 +1,6 @@
-**p8**
+**Project p8**
 
-The project plan to construct a simple virtual computer.
+This project plans to construct a simple virtual computer.
 
 The goal of the project, if any, is to build a simple virtual world where all
 its code pieces are modularized, easy to understand, reason about and hence
@@ -13,7 +13,7 @@ So, basically, this is like a minecraft game for a CS SysNet PhD (hopefully
 more insteresting and meaningful than those other computer games that ends up
 with absolutely nothing). 
 
-**plan (tentative)**
+**Tentative Plan**
 
 Design new arch and languages:
 
@@ -41,6 +41,6 @@ rewrite everything above in G language.)
 I know this project just sounds crazy... so please don't expect me to finish it
 in 100 years.
 
-**recruitement**
+**Recruitement**
 
 If you are also interested and want to help, please contact me. liulonnie@gmail.com
