@@ -1,23 +1,36 @@
 /*
-Package risc defines the op code for p8 RISC architecture.
+Package risc defines the op code for P8 RISC architecture.
 
-A p8 CPU has a pc register and 16 64-bit registers. Register $0 is always 0.
+A P8 CPU has a PC register and 16 64-bit registers. Register $0 is always 0.
 
-There is also a 64-bit time stamp counter (TSC) that increases by 1 every cycle.
+It also has a 64-bit time stamp counter (TSC) that increases by 1 every cycle.
 In the simulator, TSC (might) increase by 1 every instruction.
 
 Address length is also 64-bit. On memory alignment error or invalid
 errors, the machine halts. Memory space is virtual, split into 4K pages. A page
 can we executable or not, writable or not. Page 0 must always be invalid.
 
-There is no ring protection or interrupt handling. Processes are put in
-separate VMs, VMs communicates via register based messages and shared pages.
-A page can be mapped to multiple VMs, but only one VM can write.
+All memory accesses must be proper aligned.
 
-VM0 is the kernel VM. It listens on all kinds of system events (by default),
+P8 is little endian.
+
+Each instruction is 64-bit long. The highest 16 bits is the opcode. It is a
+jump when the highest bit of the opcode is 1, the jump will save the PC in $15
+if the second highest bit of the opcode is also 1. For details of the opcode,
+see comments of the opcode definitions.
+
+TODO: In the future, it also will support 64-bit floating point calculations.
+
+There is no ring protection or interrupt handling mechanisms within a VM.
+
+TODO: Processes will be put in separate VMs, VMs communicates via register
+based messages and shared pages. A page can be mapped to multiple VMs, but only
+one VM can write.
+
+TODO: VM0 is the kernel VM. It listens on all kinds of system events (by default),
 and manage other VMs via system calls (open, kill, pause, resume, map memory,
-map io devices). On booting, Page1 will be loaded into VM0 as writable and
-executable.
+map io devices). On bootaing, Page1 will be loaded into VM0 as writable and
+executable. When VM0 halts, the machine halts.
 */
 package risc
 
@@ -71,6 +84,6 @@ const (
 // Jump intstructions (opcode >= 0x80)
 // Format in hex: j... .... .... ...., where j=8-F
 const (
-	J   = 0x8000 // pc = I<<2
-	Jal = 0x4000 // $15=pc, pc = I<<2
+	J   = 0x8000 // pc = I<<3
+	Jal = 0x4000 // $15=pc, pc = I<<3
 )
