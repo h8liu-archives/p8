@@ -22,6 +22,7 @@ Design new arch and languages:
 
 Write some code for the new arch and languages:
 
+- `p8/risc` p8 risc opcode definitions 
 - `p8/vm` a simulator for p8
 - `p8/dasm` a p8 deassembler
 - `p8/asm` a p8 assembler
