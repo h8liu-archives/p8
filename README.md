@@ -8,8 +8,8 @@ everything. Performance and size optimizations are almost always the last
 things that need to consider.
 
 So, basically, this is like a minecraft game for a CS SysNet PhD (hopefully
-more meaningful than other computer games that ends up with absolutely
-nothing). 
+more insteresting and meaningful than those other computer games that ends up
+with absolutely nothing). 
 
 **Plan**
 
