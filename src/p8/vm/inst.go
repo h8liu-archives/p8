@@ -1,11 +1,11 @@
 package vm
 
 import (
-	. "p8/arch"
+	. "p8/opcode"
 )
 
 func (vm *VM) inst(i uint64) {
-	op := i >> 48
+	op := Opcode(i)
 	r := vm.r
 	if (op & J) != 0 {
 		vm.pc = i << 3
@@ -23,13 +23,8 @@ func (vm *VM) inst(i uint64) {
 func (vm *VM) inst0(i uint64) {
 	r := vm.r
 
-	op := i >> 48
-	x := (i >> 44) & 0xf
-	y := (i >> 40) & 0xf
-	p := (i >> 36) & 0xf
-	q := (i >> 32) & 0xf
-
-	imu := i & 0xffffffff
+	op, x, y, p, q, im := Dec(i)
+	imu := uint64(im)
 	ims := sew(uint32(imu))
 	ad := r[y] + uint64(ims)
 

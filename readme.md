@@ -22,12 +22,12 @@ Design new arch and languages:
 
 Write some code for the new arch and languages:
 
-- `p8/arch` P8 architecture
-- `p8/vm` a simulator for P8
-- `p8/asm` a P8 assembler and deassembler
-- `p8/i8` an IR8 interpreter
-- `p8/i8c` a compiler from IR8 to P8
-- `p8/gc` a compiler from G to P8 via IR8
+- `p8/opcode` P8 RISC opcode 
+- `p8/vm` P8 simulator
+- `p8/asm` P8 assembler and deassembler
+- `p8/i8` IR8 interpreter
+- `p8/i8c` IR8 to P8 compiler
+- `p8/gc` G to P8 (via IR8) compiler
 - `p8/web` a web-based user interface for the machine
 - `p8/web/vm` the vm interpreter but in javascript
 - `p8/cc` a full-fledged C compiler, compile to P8 via IR8

@@ -3,7 +3,7 @@ package asm
 import (
 	"strconv"
 
-	. "p8/arch"
+	. "p8/opcode"
 )
 
 var opStr = map[uint16]string{
