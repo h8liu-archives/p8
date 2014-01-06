@@ -24,6 +24,9 @@ func isIdentNum(r rune) bool {
 	if r >= 'A' && r <= 'Z' {
 		return true
 	}
+	if r == '_' {
+		return true
+	}
 	return false
 }
 

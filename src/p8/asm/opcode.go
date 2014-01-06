@@ -6,14 +6,7 @@ import (
 	. "p8/arch"
 )
 
-type Opcode uint64
-
-// Extract the opcode part of an instruction
-func Op(i uint64) Opcode {
-	return Opcode(i >> 48)
-}
-
-var opStr = map[Opcode]string{
+var opStr = map[uint16]string{
 	Add:  "add",
 	Addi: "addi",
 	Sub:  "sub",
@@ -56,7 +49,9 @@ var opStr = map[Opcode]string{
 	Jal: "jai",
 }
 
-func (op Opcode) String() string {
+func OpString(inst uint64) string {
+	op := uint16(inst >> 48)
+
 	if op&J != 0 {
 		if op&Jal != 0 {
 			return opStr[Jal]

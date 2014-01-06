@@ -10,9 +10,9 @@ type Assembler struct {
 	In   io.Reader
 	Log  io.Writer
 
-	lineno int
+	lineno  int
 	errored bool
-	toks []string
+	toks    []string
 }
 
 func (self *Assembler) errorf(f string, args ...interface{}) {
