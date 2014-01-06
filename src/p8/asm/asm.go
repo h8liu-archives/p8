@@ -11,71 +11,99 @@ type Assembler struct {
 	Log  io.Writer
 
 	lineno int
+	errored bool
+	toks []string
 }
 
 func (self *Assembler) errorf(f string, args ...interface{}) {
+	if self.errored {
+		return
+	}
+
 	fmt.Fprintf(self.Log, "%s:%d: ", self.Name, self.lineno)
 	fmt.Fprintf(self.Log, f, args...)
 	fmt.Fprintln(self.Log)
+
+	self.errored = true
 }
 
-func (self *Assembler) addLabel(lab string) {
-	if lab == "" {
+func (self *Assembler) addLabel() {
+	if len(self.toks) == 0 {
 		self.errorf("empty label")
+		return
+	}
+
+	if len(self.toks) > 1 {
+		self.errorf("unexpected ':'")
 		return
 	}
 
 	// TOOD: check if the label is reserved identifier
 	// TODO: dup check, add the label to index
 	panic("todo")
+
+	self.clear()
 }
 
-func (self *Assembler) addLine(op string, args []string) {
+func (self *Assembler) addLine() {
+	if len(self.toks) == 0 {
+		return // empty linie
+	}
+
 	panic("todo")
+
+	self.clear()
+}
+
+func (self *Assembler) pushToken(tok string) {
+	if !isIdentNum(rune(tok[0])) {
+		self.errorf("invalid token: %#v", tok)
+		return
+	}
+
+	if len(self.toks) < cap(self.toks) {
+		self.toks = append(self.toks, tok)
+	} else {
+		self.errorf("too many tokens")
+	}
+}
+
+func (self *Assembler) clear() {
+	self.toks = self.toks[0:0]
+}
+
+func (self *Assembler) lineNext() {
+	self.lineno++
+	self.errored = false
+}
+
+func (self *Assembler) token(tok string) {
+	if tok[0] == ';' {
+		return
+	}
+
+	switch tok {
+	case "":
+		panic("bug")
+	case "\n":
+		self.addLine()
+		self.lineNext()
+	case ":":
+		self.addLabel()
+	default:
+		self.pushToken(tok)
+	}
 }
 
 func (self *Assembler) Assemble() ([]byte, error) {
-	self.lineno = 1
-	args := make([]string, 0, 16)
-	cur := ""
+	self.toks = make([]string, 0, 8)
+
+	self.lineno = 0
+	self.lineNext()
 
 	scanner := newScanner(self.In)
 	for scanner.Scan() {
-		tok := scanner.Text()
-		if tok[0] == ';' {
-			continue
-		}
-
-		switch tok {
-		case "":
-			panic("bug")
-		case "\n":
-			self.lineno++
-			if cur != "" {
-				self.addLine(cur, args)
-				cur = ""
-				args = args[0:0]
-			}
-		case ":":
-			if len(args) > 0 {
-				self.errorf("unexpected: %#v", tok)
-			} else {
-				self.addLabel(cur)
-				cur = ""
-			}
-		default:
-			if isIdentNum(rune(tok[0])) {
-				if cur == "" {
-					cur = tok
-				} else {
-					if len(args) < cap(args) {
-						args = append(args, tok)
-					}
-				}
-			} else {
-				self.errorf("invalid token: %#v", tok)
-			}
-		}
+		self.token(scanner.Text())
 	}
 
 	return nil, scanner.Err()
