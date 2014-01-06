@@ -23,7 +23,7 @@ func (vm *VM) inst(i uint64) {
 func (vm *VM) inst0(i uint64) {
 	r := vm.r
 
-	op, x, y, p, q, im := Dec(i)
+	op, x, y, p, q, im := OpDec(i)
 	imu := uint64(im)
 	ims := sew(uint32(imu))
 	ad := r[y] + uint64(ims)

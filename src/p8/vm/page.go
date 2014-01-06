@@ -10,12 +10,13 @@ const (
 	PermWrite = 1 << iota
 	PermExec
 
-	PermAll = PermWrite | PermExec
+	PermNone = 0
+	PermAll  = PermWrite | PermExec
 )
 
 type Page struct {
-	perm uint64
-	b    []byte
+	perm  uint64
+	Bytes []byte
 }
 
 func PageStart(p uint64) uint64 { return p << PageOffset }
@@ -23,13 +24,13 @@ func PageStart(p uint64) uint64 { return p << PageOffset }
 func NewPage(perm uint64) *Page {
 	ret := new(Page)
 	ret.perm = perm
-	ret.b = make([]byte, PageSize)
+	ret.Bytes = make([]byte, PageSize)
 	return ret
 }
 
 func (p *Page) S(o uint64, n uint) []byte {
 	o &= PageOffMask
-	return p.b[o : o+uint64(n)]
+	return p.Bytes[o : o+uint64(n)]
 }
 
 func (p *Page) HavePerm(perm uint64) bool {

@@ -101,7 +101,7 @@ const (
 	Jal = 0x4000 // $15=pc, pc = I<<3
 )
 
-func e(op uint16, x, y, p, q uint8, i uint32) uint64 {
+func o(op uint16, x, y, p, q uint8, i uint32) uint64 {
 	ret := (uint64(op) << 48)
 	ret |= uint64(x&0xf) << 44
 	ret |= uint64(y&0xf) << 40
@@ -112,21 +112,21 @@ func e(op uint16, x, y, p, q uint8, i uint32) uint64 {
 	return ret
 }
 
-func Enc(op uint16) uint64                   { return e(op, 0, 0, 0, 0, 0) }
-func EncX(op uint16, x uint8) uint64         { return e(op, x, 0, 0, 0, 0) }
-func EncP(op uint16, p uint8) uint64         { return e(op, 0, 0, p, 0, 0) }
-func EncXY(op uint16, x, y uint8) uint64     { return e(op, x, y, 0, 0, 0) }
-func EncXPQ(op uint16, x, p, q uint8) uint64 { return e(op, x, 0, p, q, 0) }
-func EncXYPQ(op uint16, x, y, p, q uint8) uint64 {
-	return e(op, x, y, p, q, 0)
+func Op(op uint16) uint64                   { return o(op, 0, 0, 0, 0, 0) }
+func OpX(op uint16, x uint8) uint64         { return o(op, x, 0, 0, 0, 0) }
+func OpP(op uint16, p uint8) uint64         { return o(op, 0, 0, p, 0, 0) }
+func OpXY(op uint16, x, y uint8) uint64     { return o(op, x, y, 0, 0, 0) }
+func OpXPQ(op uint16, x, p, q uint8) uint64 { return o(op, x, 0, p, q, 0) }
+func OpXYPQ(op uint16, x, y, p, q uint8) uint64 {
+	return o(op, x, y, p, q, 0)
 }
-func EncXI(op uint16, x uint8, i uint32) uint64 {
-	return e(op, x, 0, 0, 0, i)
+func OpXI(op uint16, x uint8, i uint32) uint64 {
+	return o(op, x, 0, 0, 0, i)
 }
-func EncXYI(op uint16, x, y uint8, i uint32) uint64 {
-	return e(op, x, y, 0, 0, i)
+func OpXYI(op uint16, x, y uint8, i uint32) uint64 {
+	return o(op, x, y, 0, 0, i)
 }
-func EncJ(op uint16, ad uint64) uint64 {
+func OpJ(op uint16, ad uint64) uint64 {
 	ret := (J << 48) | (ad >> 3)
 	if op&Jal != 0 {
 		ret |= (Jal << 48)
@@ -138,12 +138,12 @@ func Opcode(i uint64) uint16 {
 	return uint16(i >> 48)
 }
 
-func Dec(i uint64) (op uint16, x, y, p, q uint8, im uint32) {
-	op = uint16(op >> 48)
-	x = uint8(x>>44) & 0xf
-	y = uint8(x>>40) & 0xf
-	p = uint8(x>>36) & 0xf
-	q = uint8(x>>32) & 0xf
-	im = uint32(x)
+func OpDec(i uint64) (op uint16, x, y, p, q uint8, im uint32) {
+	op = uint16(i >> 48)
+	x = uint8(i>>44) & 0xf
+	y = uint8(i>>40) & 0xf
+	p = uint8(i>>36) & 0xf
+	q = uint8(i>>32) & 0xf
+	im = uint32(i)
 	return
 }
