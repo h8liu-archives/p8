@@ -24,8 +24,7 @@ Write some code for the new arch and languages:
 
 - `p8/arch` P8 architecture
 - `p8/vm` a simulator for P8
-- `p8/dasm` a P8 deassembler
-- `p8/asm` a P8 assembler
+- `p8/asm` a P8 assembler and deassembler
 - `p8/i8` an IR8 interpreter
 - `p8/i8c` a compiler from IR8 to P8
 - `p8/gc` a compiler from G to P8 via IR8
