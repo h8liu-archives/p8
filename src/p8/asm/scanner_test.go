@@ -45,14 +45,14 @@ func TestScanner(t *testing.T) {
 		halt
 	    ; some more comment
 	; and that's it`, []string{
-		"add", "r0", ",", "r1", ",", "r2", "\n",
-		"sub", "r3", ",", "r4", ",", "r5", "; some comment here", "\n",
+		"add", "r0", "r1", "r2", "\n",
+		"sub", "r3", "r4", "r5", "; some comment here", "\n",
 		"\n",
 		"main", ":", "\n",
-		"xor", "r3", ",", "r4", ",", "r7", "\n",
+		"xor", "r3", "r4", "r7", "\n",
 		"\n",
-		"loop", ":", "slt", "r7", ",", "r0", ",", "r3", "\n",
-		"jne", "r0", ",", "r1", ",", "loop", "\n",
+		"loop", ":", "slt", "r7", "r0", "r3", "\n",
+		"jne", "r0", "r1", "loop", "\n",
 		"halt", "\n",
 		"; some more comment", "\n",
 		"; and that's it",

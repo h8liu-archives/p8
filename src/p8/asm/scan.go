@@ -8,7 +8,10 @@ import (
 )
 
 func isSpace(r rune) bool {
-	return r != '\n' && unicode.IsSpace(r)
+	if r == '\n' {
+		return false
+	}
+	return r == ',' || unicode.IsSpace(r)
 }
 
 func isIdentNum(r rune) bool {
@@ -68,7 +71,7 @@ func scanToken(data []byte, atEOF bool) (adv int, token []byte, err error) {
 		if end >= len(data) && !atEOF {
 			return 0, nil, nil // need more
 		}
-	} else if r == ':' || r == '\n' || r == ',' {
+	} else if r == ':' || r == '\n' {
 		// special char, don't need to do anything
 	} else {
 		// invalid char, don't need to do anything
