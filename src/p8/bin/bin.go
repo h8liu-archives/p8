@@ -1,13 +1,13 @@
-package vm
+package bin
 
-func u16(b []byte) uint16 {
+func U16(b []byte) uint16 {
 	if b == nil {
 		return 0
 	}
 	return uint16(b[0]) | uint16(b[1])<<8
 }
 
-func u16p(b []byte, v uint16) {
+func U16p(b []byte, v uint16) {
 	if b == nil {
 		return
 	}
@@ -15,7 +15,7 @@ func u16p(b []byte, v uint16) {
 	b[1] = byte(v >> 8)
 }
 
-func u32(b []byte) uint32 {
+func U32(b []byte) uint32 {
 	if b == nil {
 		return 0
 	}
@@ -26,7 +26,7 @@ func u32(b []byte) uint32 {
 	return ret
 }
 
-func u32p(b []byte, v uint32) {
+func U32p(b []byte, v uint32) {
 	if b == nil {
 		return
 	}
@@ -36,7 +36,7 @@ func u32p(b []byte, v uint32) {
 	b[3] = byte(v >> 24)
 }
 
-func u64(b []byte) uint64 {
+func U64(b []byte) uint64 {
 	if b == nil {
 		return 0
 	}
@@ -51,7 +51,7 @@ func u64(b []byte) uint64 {
 	return ret
 }
 
-func u64p(b []byte, v uint64) {
+func U64p(b []byte, v uint64) {
 	if b == nil {
 		return
 	}
