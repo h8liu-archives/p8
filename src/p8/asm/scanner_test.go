@@ -6,7 +6,7 @@ import (
 )
 
 func TestScanner(t *testing.T) {
-	tokens := func (s string) []string {
+	tokens := func(s string) []string {
 		ret := make([]string, 0, 1024)
 		in := strings.NewReader(s)
 		scanner := newScanner(in)
@@ -19,12 +19,12 @@ func TestScanner(t *testing.T) {
 
 		return ret
 	}
-	
+
 	c := func(s string, expect []string) {
 		got := tokens(s)
 		for i := 0; i < len(got) && i < len(expect); i++ {
 			if got[i] != expect[i] {
-				t.Errorf("token %d, expect %#v, got %#v,", 
+				t.Errorf("token %d, expect %#v, got %#v,",
 					i, expect[i], got[i])
 			}
 		}
@@ -58,4 +58,3 @@ func TestScanner(t *testing.T) {
 		"; and that's it",
 	})
 }
-
