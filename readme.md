@@ -40,6 +40,6 @@ rewrite everything above in G language.)
 I know this project just sounds crazy... so please don't expect me to finish it
 in 100 years.
 
-**Recruitement**
+**Help Note**
 
-If you are also interested and want to help, please contact me. liulonnie@gmail.com
+If you are also interested, help is always welcomed. Feel free to fork. My contact: liulonnie@gmail.com
