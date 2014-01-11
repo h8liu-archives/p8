@@ -80,11 +80,11 @@ func (vm *VM) inst0(i uint64) {
 		vm.pc = r[p]
 	case Beq:
 		if r[x] == r[y] {
-			vm.pc += uint64(ims) << 2
+			vm.pc += uint64(ims) << 3
 		}
 	case Bne:
 		if r[x] != r[y] {
-			vm.pc += uint64(ims) << 2
+			vm.pc += uint64(ims) << 3
 		}
 
 	// mul and div

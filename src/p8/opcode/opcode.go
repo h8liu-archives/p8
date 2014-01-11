@@ -134,6 +134,13 @@ func OpJ(op uint16, ad uint64) uint64 {
 	return ret
 }
 
+func InstSetI(inst uint64, i uint32) uint64 {
+	inst >>= 32
+	inst <<= 32
+	inst |= uint64(i)
+	return inst
+}
+
 func Opcode(i uint64) uint16 {
 	return uint16(i >> 48)
 }
