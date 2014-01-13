@@ -57,12 +57,12 @@ const (
 	Nor                 // x = p nor q
 	Slt                 // x = p < q ? 1 : 0
 	Slti                // x = (y < signed(i)) ? 1 : 0
-	Sll                 // x = p << q!
-	Srl                 // x = p >> q!, unsigned
-	Sra                 // x = p >> q!, signed
-	Sllv                // x = p << q
-	Srlv                // x = p >> q, unsigned
-	Srav                // x = p >> q, signed
+	Slli                // x = p << i
+	Srli                // x = p >> i, unsigned
+	Srai                // x = p >> i, signed
+	Sll                 // x = p << q
+	Srl                 // x = p >> q, unsigned
+	Sra                 // x = p >> q, signed
 )
 
 // jumps
@@ -123,12 +123,18 @@ func OpXYPQ(op uint16, x, y, p, q uint8) uint64 {
 func OpXI(op uint16, x uint8, i uint32) uint64 {
 	return o(op, x, 0, 0, 0, i)
 }
+func OpXIs(op uint16, x uint8, i int32) uint64 {
+	return OpXI(op, x, uint32(i))
+}
 func OpXYI(op uint16, x, y uint8, i uint32) uint64 {
 	return o(op, x, y, 0, 0, i)
 }
+func OpXYIs(op uint16, x, y uint8, i int32) uint64 {
+	return OpXYI(op, x, y, uint32(i))
+}
 func OpJ(op uint16, ad uint64) uint64 {
 	ret := (J << 48) | (ad >> 3)
-	if op&Jal != 0 {
+	if (op&Jal) != 0 {
 		ret |= (Jal << 48)
 	}
 	return ret

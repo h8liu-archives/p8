@@ -8,10 +8,10 @@ func (vm *VM) inst(i uint64) {
 	op := Opcode(i)
 	r := vm.r
 	if (op & J) != 0 {
-		vm.pc = i << 3
 		if (op & Jal) != 0 {
 			r[15] = vm.pc
 		}
+		vm.pc = i << 3
 	} else {
 		switch op >> 12 {
 		case 0:
@@ -41,7 +41,7 @@ func (vm *VM) inst0(i uint64) {
 	case Add:
 		r[x] = r[p] + r[q]
 	case Addi:
-		r[x] = r[y] + imu
+		r[x] = r[y] + uint64(ims)
 	case Sub:
 		r[x] = r[p] - r[q]
 	case Lui:
@@ -62,17 +62,17 @@ func (vm *VM) inst0(i uint64) {
 		r[x] = _slt(r[p], r[q])
 	case Slti:
 		r[x] = _slt(r[y], imu)
+	case Slli:
+		r[x] = r[y] << imu
+	case Srli:
+		r[x] = r[y] >> imu
+	case Srai:
+		r[x] = uint64(int64(r[y]) >> imu)
 	case Sll:
-		r[x] = r[p] << q
-	case Srl:
-		r[x] = r[p] >> q
-	case Sra:
-		r[x] = uint64(int64(r[p]) >> q)
-	case Sllv:
 		r[x] = r[p] << r[q]
-	case Srlv:
+	case Srl:
 		r[x] = r[p] >> r[q]
-	case Srav:
+	case Sra:
 		r[x] = uint64(int64(r[p]) >> r[q])
 
 	// control flow

@@ -1,5 +1,12 @@
 package vm
 
+import (
+	"io"
+	"fmt"
+
+	"p8/opcode"
+)
+
 // the virtual machine
 type VM struct {
 	r []uint64
@@ -8,6 +15,7 @@ type VM struct {
 	TSC uint64
 	TTL uint64
 
+	Log io.Writer
 	pages map[uint64]*Page
 	e     uint64
 }
@@ -52,9 +60,16 @@ func (vm *VM) tick() {
 	}
 }
 
+func (vm *VM) log(i uint64) {
+	if vm.Log != nil {
+		fmt.Fprintf(vm.Log, "%x: %016x ; %s\n", vm.pc, i, opcode.InstStr(i))
+	}
+}
+
 func (vm *VM) step() uint64 {
 	// read
 	i := vm.rdInst()
+	vm.log(i)
 	vm.pc += 8
 
 	// exec

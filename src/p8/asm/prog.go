@@ -3,6 +3,7 @@ package asm
 import (
 	"bytes"
 	"fmt"
+	"io"
 )
 
 type Prog struct {
@@ -59,4 +60,11 @@ func (self *Prog) Assemble(start uint64) []byte {
 	}
 
 	return ret.Bytes()
+}
+
+func (self *Prog) Fprint(out io.Writer) {
+	for _, f := range self.funcs {
+		f.Fprint(out)
+		fmt.Fprintln(out)
+	}
 }

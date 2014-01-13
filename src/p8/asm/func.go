@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"p8/bin"
 	"p8/opcode"
 )
 
@@ -60,6 +61,7 @@ func (self *Func) locateLabel(label string, prog *Prog) (uint64, error) {
 }
 
 func (self *Func) assembleInto(out *bytes.Buffer, prog *Prog) {
+	buf := make([]byte, 8)
 	for i, inst := range self.insts {
 		line := inst.Line
 		op := opcode.Opcode(line)
@@ -70,7 +72,7 @@ func (self *Func) assembleInto(out *bytes.Buffer, prog *Prog) {
 				continue
 			}
 
-			thisPos := self.Pos + (uint64(i) << 3) + 8
+			thisPos := self.Pos + (uint64(i) << 3) - 8
 			thatPos, e := self.locateLabel(inst.JmpLabel, prog)
 			if e != nil {
 				inst.E(e)
@@ -84,7 +86,7 @@ func (self *Func) assembleInto(out *bytes.Buffer, prog *Prog) {
 				continue
 			}
 			inst.I(opcode.InstSetI(line, uint32(diff)))
-		} else if op == opcode.J || op == opcode.Jal {
+		} else if (op & opcode.J) != 0 {
 			if inst.JmpLabel == "" {
 				inst.E(fmt.Errorf("empty label"))
 				continue
@@ -95,12 +97,15 @@ func (self *Func) assembleInto(out *bytes.Buffer, prog *Prog) {
 				inst.E(e)
 				continue
 			}
-			inst.I(opcode.OpJ(op, pos>>3))
+			inst.I(opcode.OpJ(op, pos))
 		} else {
 			if inst.JmpLabel != "" {
-				inst.E(fmt.Errorf("non-empty label"))
+				inst.E(fmt.Errorf("non-empty label: %s", inst.JmpLabel))
 			}
 		}
+
+		bin.U64p(buf, inst.Line)
+		out.Write(buf)
 	}
 }
 
@@ -119,5 +124,4 @@ func (self *Func) Fprint(out io.Writer) {
 		fmt.Fprintln(out)
 	}
 	fmt.Fprintln(out, "}")
-	fmt.Fprintln(out)
 }
