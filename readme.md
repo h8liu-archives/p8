@@ -12,12 +12,15 @@ So, basically, this is like a minecraft game for a CS SysNet PhD (hopefully
 more insteresting and meaningful than those other computer games that ends up
 with absolutely nothing). 
 
+**Progress**
+
+- VM with basic opcodes working, can run a fabonacci program
+
 **TODO list**
 
-- Some handful api for writing assembly
-- More test cases for P8 (if not a parser yet)
 - Syscall for simple IO
 - VM in javascript
+- Asm parser and compiler, in javascript and go
 - A tictactoe game and AI
 
 **Tentative Plan**
