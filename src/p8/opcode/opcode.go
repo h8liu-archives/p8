@@ -134,7 +134,7 @@ func OpXYIs(op uint16, x, y uint8, i int32) uint64 {
 }
 func OpJ(op uint16, ad uint64) uint64 {
 	ret := (J << 48) | (ad >> 3)
-	if (op&Jal) != 0 {
+	if (op & Jal) != 0 {
 		ret |= (Jal << 48)
 	}
 	return ret

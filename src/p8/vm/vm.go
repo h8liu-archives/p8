@@ -1,8 +1,8 @@
 package vm
 
 import (
-	"io"
 	"fmt"
+	"io"
 
 	"p8/opcode"
 )
@@ -15,7 +15,7 @@ type VM struct {
 	TSC uint64
 	TTL uint64
 
-	Log io.Writer
+	Log   io.Writer
 	pages map[uint64]*Page
 	e     uint64
 }
