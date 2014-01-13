@@ -43,7 +43,7 @@ func p1() *asm.Prog {
 
 func p2() *asm.Prog {
 	p := asm.NewProg()
-	
+
 	f := p.F("main")
 	f.Jal("f")
 	f.Halt()
