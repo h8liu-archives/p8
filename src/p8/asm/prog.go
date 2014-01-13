@@ -52,7 +52,7 @@ func (self *Prog) Assemble(start uint64) []byte {
 	// assign positions
 	for _, f := range self.funcs {
 		f.Pos = p
-		p += uint64(len(f.insts)) * 8
+		p += uint64(len(f.insts)) << 3
 	}
 
 	for _, f := range self.funcs {

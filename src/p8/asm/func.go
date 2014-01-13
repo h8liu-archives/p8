@@ -54,7 +54,7 @@ func (self *Func) L(lab string) *Label {
 func (self *Func) locateLabel(label string, prog *Prog) (uint64, error) {
 	lab, exists := self.labelMap[label]
 	if exists {
-		return self.Pos + lab.Pos, nil
+		return self.Pos + (lab.Pos << 3), nil
 	}
 
 	return prog.funcPos(label)
@@ -72,7 +72,7 @@ func (self *Func) assembleInto(out *bytes.Buffer, prog *Prog) {
 				continue
 			}
 
-			thisPos := self.Pos + (uint64(i) << 3) - 8
+			thisPos := self.Pos + (uint64(i) << 3) + 8
 			thatPos, e := self.locateLabel(inst.JmpLabel, prog)
 			if e != nil {
 				inst.E(e)

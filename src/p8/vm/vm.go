@@ -62,7 +62,8 @@ func (vm *VM) tick() {
 
 func (vm *VM) log(i uint64) {
 	if vm.Log != nil {
-		fmt.Fprintf(vm.Log, "%x: %016x ; %s\n", vm.pc, i, opcode.InstStr(i))
+		fmt.Fprintf(vm.Log, "%x: %016x ; %s ; $1=%d, $2=%d\n", 
+			vm.pc, i, opcode.InstStr(i), vm.r[1], vm.r[2])
 	}
 }
 
@@ -107,5 +108,6 @@ func (vm *VM) StepAt(start uint64) uint64 {
 	return vm.Step()
 }
 
-func (vm *VM) R(a uint8) uint64 { return vm.r[a] }
-func (vm *VM) PC() uint64       { return vm.pc }
+func (vm *VM) R(a uint8) uint64       { return vm.r[a] }
+func (vm *VM) Rset(a uint8, v uint64) { vm.r[a] = v }
+func (vm *VM) PC() uint64             { return vm.pc }
