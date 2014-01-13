@@ -77,9 +77,9 @@ func InstStr(i uint64) string {
 		return fmt.Sprintf("jr $%d", p)
 
 	case Beq:
-		return fmt.Sprintf("beq %d", ims<<3)
+		return xyis("beq")
 	case Bne:
-		return fmt.Sprintf("bne %d", ims<<3)
+		return xyis("bne")
 
 	case Mul:
 		return xpq("mul")
