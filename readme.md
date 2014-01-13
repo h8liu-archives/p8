@@ -12,6 +12,14 @@ So, basically, this is like a minecraft game for a CS SysNet PhD (hopefully
 more insteresting and meaningful than those other computer games that ends up
 with absolutely nothing). 
 
+**TODO list**
+
+- Some handful api for writing assembly
+- More test cases for P8 (if not a parser yet)
+- Syscall for simple IO
+- VM in javascript
+- A tictactoe game and AI
+
 **Tentative Plan**
 
 Design new arch and languages:
@@ -24,7 +32,7 @@ Write some code for the new arch and languages:
 
 - `p8/opcode` P8 RISC opcode 
 - `p8/vm` P8 simulator
-- `p8/asm` P8 assembler and deassembler
+- `p8/asm` P8 assembler
 - `p8/i8` IR8 interpreter
 - `p8/i8c` IR8 to P8 compiler
 - `p8/gc` G to P8 (via IR8) compiler
@@ -40,6 +48,6 @@ rewrite everything above in G language.)
 I know this project just sounds crazy... so please don't expect me to finish it
 in 100 years.
 
-**Help Note**
+**Help Needed**
 
 If you are also interested, help is always welcomed. Feel free to fork. My contact: liulonnie@gmail.com
