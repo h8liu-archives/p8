@@ -16,7 +16,11 @@ func TestProgs(t *testing.T) {
 
 		v.TTL = ttl
 
-		v.ResumeAt(vm.PageStart(1))
+		r := v.ResumeAt(vm.PageStart(1))
+		if r != vm.ExcepHalt {
+			t.Errorf("vm exit with %d", r)
+		}
+
 		return v
 	}
 
