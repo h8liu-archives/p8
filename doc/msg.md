@@ -33,12 +33,26 @@ syscall
 - return value p
 - return value q
 
+syscalli
+- input: call i
+- input: parameter y
+...
+
 default pipes
-- pipe 0, stdin stream
-- pipe 1, stdout stream
+- pipe 0, int stream // a stream of uint64 integers
+- pipe 1, tty stream // a stream of uint64 integers
 
 - 0 reseved
 - 1 new page (addr, perm) -> error
 - 2 del page (addr) -> error
 - 3 pipe recv
 - 4 pipe send
+
+so, to send a char out via vm
+- save the char in a register, say register 1
+
+addi 1, 0, 4 // send out
+addi 2, 0, 0 // pipe id
+ld 3, 14, 0 // load the int
+syscalli 1, 2, 3, 0
+

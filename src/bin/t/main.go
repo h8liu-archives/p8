@@ -55,7 +55,7 @@ func p2() *asm.Prog {
 }
 
 func main() {
-	p := p2()
+	p := p1()
 
 	buf := p.Assemble(vm.PageStart(1))
 	p.Fprint(os.Stdout)
