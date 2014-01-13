@@ -64,4 +64,7 @@ func TestBasicOps(t *testing.T) {
 		OpJ(Jal, 4096+8),
 	)
 	reg(vm, 15, 4096+8)
+
+	vm = v(OpXYI(Addi, 0, 1, 373))
+	reg(vm, 0, 0)
 }
