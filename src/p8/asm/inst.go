@@ -19,16 +19,19 @@ func newInst(line uint64) *Inst {
 	return ret
 }
 
-func (self *Inst) L(label string) {
+func (self *Inst) L(label string) *Inst {
 	self.JmpLabel = label
+	return self
 }
 
-func (self *Inst) I(line uint64) {
+func (self *Inst) I(line uint64) *Inst {
 	self.Line = line
+	return self
 }
 
-func (self *Inst) E(e error) {
+func (self *Inst) E(e error) *Inst {
 	self.Error = e
+	return self
 }
 
 func (self *Inst) Fprint(out io.Writer) {

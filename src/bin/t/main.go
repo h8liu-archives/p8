@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"p8/asm"
-	. "p8/opcode"
 	"p8/vm"
 )
 
@@ -29,25 +28,28 @@ func PrintRegs(vm *vm.VM) { FprintRegs(os.Stdout, vm) }
 
 func p1() *asm.Prog {
 	p := asm.NewProg()
+
 	f := p.F("main")
-	f.I(OpXYI(Addi, 1, 0, 5))
-	f.I(OpXPQ(Add, 2, 0, 0))
+	f.Addi(1, 0, 5)
+	f.Add(2, 0, 0)
 	f.L("loop")
-	f.I(OpXPQ(Add, 2, 2, 1))
-	f.I(OpXYIs(Addi, 1, 1, -1))
-	f.I(OpXY(Bne, 0, 1)).L("loop")
-	f.I(Op(Halt))
+	f.Add(2, 2, 1)
+	f.Addi(1, 1, -1)
+	f.Bne(0, 1, "loop")
+	f.Halt()
+
 	return p
 }
 
 func p2() *asm.Prog {
 	p := asm.NewProg()
+	
 	f := p.F("main")
-	f.I(Op(J | Jal)).L("f")
-	f.I(Op(Halt))
+	f.Jal("f")
+	f.Halt()
 
 	f = p.F("f")
-	f.I(OpP(Jr, 15))
+	f.Jr(15)
 
 	return p
 }
