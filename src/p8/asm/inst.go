@@ -1,8 +1,13 @@
 package asm
 
+import (
+	"io"
+)
+
 type Inst struct {
 	Line     uint64
 	JmpLabel string
+	Error    error
 }
 
 func newInst(line uint64) *Inst {
@@ -17,4 +22,12 @@ func (self *Inst) J(label string) {
 
 func (self *Inst) I(line uint64) {
 	self.Line = line
+}
+
+func (self *Inst) E(e error) {
+	self.Error = e
+}
+
+func (self *Inst) Fprint(out io.Writer) {
+	panic("todo")
 }

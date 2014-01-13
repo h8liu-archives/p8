@@ -27,6 +27,14 @@ func (self *Prog) Func(name string) (*Func, error) {
 	return ret, nil
 }
 
+func (self *Prog) F(name string) *Func {
+	ret, e := self.Func(name)
+	if e != nil {
+		panic(e)
+	}
+	return ret
+}
+
 func (self *Prog) funcPos(name string) (uint64, error) {
 	f, exists := self.funcs[name]
 	if !exists {
@@ -36,7 +44,7 @@ func (self *Prog) funcPos(name string) (uint64, error) {
 	return f.Pos, nil
 }
 
-func (self *Prog) Assemble(start uint64) ([]byte, error) {
+func (self *Prog) Assemble(start uint64) []byte {
 	ret := new(bytes.Buffer)
 	p := start
 
@@ -47,11 +55,8 @@ func (self *Prog) Assemble(start uint64) ([]byte, error) {
 	}
 
 	for _, f := range self.funcs {
-		e := f.assembleInto(ret, self)
-		if e != nil {
-			return nil, e
-		}
+		f.assembleInto(ret, self)
 	}
 
-	return ret.Bytes(), nil
+	return ret.Bytes()
 }
