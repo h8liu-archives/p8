@@ -62,7 +62,7 @@ func (vm *VM) tick() {
 
 func (vm *VM) log(i uint64) {
 	if vm.Log != nil {
-		fmt.Fprintf(vm.Log, "%x: %016x ; %s ; $1=%d, $2=%d\n", 
+		fmt.Fprintf(vm.Log, "%x: %016x ; %s ; $1=%d, $2=%d\n",
 			vm.pc, i, opcode.InstStr(i), vm.r[1], vm.r[2])
 	}
 }
