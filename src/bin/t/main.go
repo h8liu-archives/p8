@@ -39,7 +39,7 @@ func p0() *asm.Prog {
 	return pc   <- call2 stack pointer
 	*/
 
-	arg := int32(10)
+	arg := int32(4)
 	f := p.F("main")
 	f.Addi(14, 0, int32(vm.PageStart(2)))
 	f.Addi(1, 0, arg) 
