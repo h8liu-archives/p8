@@ -20,7 +20,7 @@ func NewProg() *Prog {
 func (self *Prog) Func(name string) (*Func, error) {
 	_, exists := self.funcs[name]
 	if exists {
-		return nil, fmt.Errorf("function %s exists", name)
+		return nil, fmt.Errorf("function %s declared already", name)
 	}
 
 	ret := newFunc(name)

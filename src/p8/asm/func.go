@@ -110,7 +110,7 @@ func (self *Func) assembleInto(out *bytes.Buffer, prog *Prog) {
 }
 
 func (self *Func) Fprint(out io.Writer) {
-	fmt.Fprintf(out, "func %s {\n", self.Name)
+	fmt.Fprintf(out, "func %s:\n", self.Name)
 	labIndex := 0
 	for i, inst := range self.insts {
 		for labIndex < len(self.labels) &&
@@ -123,5 +123,4 @@ func (self *Func) Fprint(out io.Writer) {
 		inst.Fprint(out)
 		fmt.Fprintln(out)
 	}
-	fmt.Fprintln(out, "}")
 }

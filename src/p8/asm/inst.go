@@ -11,6 +11,7 @@ type Inst struct {
 	Line     uint64
 	JmpLabel string
 	Error    error
+	LineNo   int
 }
 
 func newInst(line uint64) *Inst {
