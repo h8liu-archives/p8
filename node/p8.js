@@ -224,7 +224,6 @@
         this.printi = function(i) { console.log(i); }
         this.log = function(pc, inst, s) { }
         // this.log = function(pc, inst, s) { console.log(pc, s); }
-        this.asm = asm;
     }
 
     function PageWriter(page) {
@@ -246,6 +245,7 @@
         errHalt: errHalt,
         errAddr: errAddr,
         errDeath: errDeath,
+        Asm: Asm,
         VM: VM,
         PageWriter: PageWriter,
         Page: Page,
