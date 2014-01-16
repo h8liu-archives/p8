@@ -1,2 +1,2 @@
 test:
-	coffee test.coffee
+	coffee tests/p8.coffee
