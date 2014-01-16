@@ -1,4 +1,6 @@
-all:
+all: run
+
+run:
 	node run.js
 
 fmt:
