@@ -119,7 +119,7 @@ function Asm() {
 }
 
 function VM() {
-    var thiz = this;
+    var thiz = thi;
     var pages = {};
     var nreg = 8;
     var iregs = new Int32Array(nreg);
@@ -151,13 +151,13 @@ function VM() {
     function u32(a) { c32(a); return page(a).u32(pageOff(a)); }
     function f64(a) { c64(a); return page(a).u64(pageOff(a)); }
 
-    function pi8(a, v) { return page(a).pi8(pageOff(a)); }
-    function pu8(a, v) { return page(a).pu8(pageOff(a)); }
-    function pi16(a, v) { c16(a); return page(a).pi16(pageOff(a)); }
-    function pu16(a, v) { c16(a); return page(a).pu16(pageOff(a)); }
-    function pi32(a, v) { c32(a); return page(a).pi32(pageOff(a)); }
-    function pu32(a, v) { c32(a); return page(a).pu32(pageOff(a)); }
-    function pf64(a, v) { c64(a); return page(a).pf64(pageOff(a)); }
+    function pi8(a, v) { return page(a).pi8(pageOff(a), v); }
+    function pu8(a, v) { return page(a).pu8(pageOff(a), v); }
+    function pi16(a, v) { c16(a); return page(a).pi16(pageOff(a), v); }
+    function pu16(a, v) { c16(a); return page(a).pu16(pageOff(a), v); }
+    function pi32(a, v) { c32(a); return page(a).pi32(pageOff(a), v); }
+    function pu32(a, v) { c32(a); return page(a).pu32(pageOff(a), v); }
+    function pf64(a, v) { c64(a); return page(a).pf64(pageOff(a), v); }
 
     var asm = new Asm();
     var execs = {};
