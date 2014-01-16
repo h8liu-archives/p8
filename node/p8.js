@@ -97,26 +97,22 @@
 
             nop += 1;
         }
-
         function add0(name) {
             add(name, function(p) { return name; },
                     function() { return makeInst(0, 0, 0, 0); },
                     function(line) { todo(); });
         }
-
         function add0Ims(name) {
-            add(name, function(p) { return name; },
-                    function() { return name + " " + p.ims; },
-                    function() { return makeInst(0, 0, 0, ims); },
+            add(name, function(p) { return name + " " + p.ims; },
+                    function(ims) { return makeInst(0, 0, 0, ims); },
                     function(line) { todo(); });
         }
-
         add0("halt");
         add0Ims("printi");
 
-        this.code = function(name) { 
+        this.byname = function(name) { 
             if (name in byname) {
-                return byname[name]
+                return byname[name];
             }
             return false;
         }
@@ -163,47 +159,23 @@
         function pu32(a, v) { c32(a); return page(a).pu32(pageOff(a)); }
         function pf64(a, v) { c64(a); return page(a).pf64(pageOff(a)); }
 
-        var ops = [];
-        var asm = {};
-
-        function o(name, exec, str, make) {
-            var op = {
-                code: ops.length,
-                exec: exec,
-                str: str,
-                make: make,
-            };
-
-            ops.push(op);
-            asm[name] = function(a, b, c, d, e) {
-                var ret = op.make(a, b, c, d, e);
-                ret |= op.code << 25;
-                return ret
-            };
+        var asm = new Asm();
+        var execs = {};
+        var strs = {};
+        function o(name, exec) { 
+            var ret = asm.byname(name);
+            if (ret == false) { return; }
+            var code = ret.code;
+            execs[code] = exec;
+            strs[code] = ret.str;
         }
-
-        function makeArgs(x, p, q, i) {
-            var ret = 0;
-            ret = ret | (i & 0xffff);
-            ret = ret | ((q & 0x7) << 16);
-            ret = ret | ((p & 0x7) << 19);
-            ret = ret | ((x & 0x7) << 22);
-            return ret;
-        }
-        function o0(name, f) { o(name, f, 
-                function(p) { return name; }, 
-                function() { return makeArgs(0, 0, 0, 0) }); }
-        function oims(name, f) { o(name, f, 
-                function(p) { return name + " " + p.ims; }, 
-                function(ims) { return makeArgs(0, 0, 0, ims) }); }
-
-        o0("halt", function(p) { e = errHalt });
-        oims("printi", function(p) { thiz.printi(p.ims) });
+        o("halt", function(p) { e = errHalt });
+        o("printi", function(p) { thiz.printi(p.ims) });
 
         function exec(inst, oldPc) {
-            var opcode = (inst >> 25) & 0x7f;
+            var code = (inst >> 25) & 0x7f;
             var parts = {
-                code: opcode,
+                code: code,
                 x: (inst >> 22) & 0x7,
                 p: (inst >> 19) & 0x7,
                 q: (inst >> 16) & 0x7,
@@ -211,10 +183,9 @@
                 ims: (inst << 16 >> 16),
             }
 
-            if (opcode in ops) {
-                var op = ops[opcode];
-                thiz.log(oldPc, inst, op.str(parts))
-                op.exec(parts);
+            if (code in execs) {
+                thiz.log(oldPc, inst, strs[code](parts));
+                execs[code](parts);
             } else {
                 console.log(oldpc, "noop")
             }
@@ -252,6 +223,7 @@
         this.step = function() { e = 0; step(); return e; }
         this.printi = function(i) { console.log(i); }
         this.log = function(pc, inst, s) { }
+        // this.log = function(pc, inst, s) { console.log(pc, s); }
         this.asm = asm;
     }
 
