@@ -1,0 +1,33 @@
+a subsetting golang
+
+stage 1
+- all algrithmatic operations
+- basic types: ints and floats
+- packaging
+- functions
+- pointers
+- const
+- iota
+- new and make
+- defer
+- print
+- println
+
+state 2
+- slices
+- maps
+- strings
+- range
+
+state 3
+- structs
+- interfaces
+
+stage 4
+- goroutine
+- chan
+
+stage 5
+- garbage collection
+- scheduling
+- os related
