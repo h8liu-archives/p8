@@ -2,11 +2,12 @@
 
 main = ->
     p = new p8.Page()
-    w = new p8.PageWriter(p)
-    asm = new p8.Asm()
-    w.u32 asm.printi 1987
-    w.u32 asm.printi 1
-    w.u32 asm.printi 21
+    asm = new p8.PageAsm(p)
+    asm.printi 1987
+    asm.printi 1
+    asm.printi 21
+    asm.printi 32
+    asm.label "so"
 
     vm = new p8.Vm()
     vm.mapPage p8.pageHead(1), p

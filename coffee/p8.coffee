@@ -52,6 +52,7 @@ Asm = ->
     thiz = this
     byname = {}
     bycode = {}
+    names = []
     nop = 0
     
     makeInst = (x, p, q, i) ->
@@ -72,6 +73,7 @@ Asm = ->
             make: make
             parse: parse
         }
+        names.push name
         byname[name] = op
         bycode[nop] = op
         thiz[name] = (a, b, c, d, e) ->
@@ -95,7 +97,8 @@ Asm = ->
 
     this.byname = (name) ->
         if name of byname then byname[name] else false
-
+    this.names = names
+    
     return # Asm
 
 Vm = ->
@@ -209,6 +212,24 @@ PageWriter = (page) ->
 
     return # PageWriter
 
+PageAsm = (page) ->
+    p = page
+    writer = new PageWriter(page)
+    thiz = this
+    asm = new Asm()
+    labels = {}
+
+    for name in asm.names
+        thiz[name] = (a, b, c, d, e) ->
+            writer.u32(asm[name](a, b, c, d, e))
+
+    this.label = (lab) ->
+        console.log lab, writer.off
+        labels[lab] = writer.off
+        return
+
+    return
+
 exports.p8 =
     errHalt: errHalt
     errAddr: errAddr
@@ -216,6 +237,7 @@ exports.p8 =
     Asm: Asm
     Vm: Vm
     PageWriter: PageWriter
+    PageAsm: PageAsm
     Page: Page
     pageHead: pageHead
 
