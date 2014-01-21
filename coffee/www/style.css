@@ -6,11 +6,9 @@ body {
     text-align: center;
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 canvas#main {
-    position: fixed:
-    top: 0px;
-    left: 0px;
     margin: 0;
     padding: 0;
     background: #eee; 

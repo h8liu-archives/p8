@@ -5,18 +5,15 @@ logger = $("logger")[0]
 dpr = window.devicePixelRatio
 console.log dpr
 ctx = main.getContext "2d"
+fontsize = 13
 
 # ctx.scale first and then zoom with width, height
 # the order here is critical
-ctx.scale dpr, dpr
-main.width = 1200 * dpr
-main.height = 600 * dpr
-main.style.width = px(1200)
-main.style.height = px(600)
 
 drawText = ->
     message = 'Hello, world!'
-    height = 13 * dpr
+    height = fontsize * dpr
+    ctx.scale dpr, dpr
     ctx.font = '' + height + 'px Consolas'
     width = ctx.measureText('M').width
     console.log width
@@ -37,8 +34,8 @@ timer = ->
     winWidth = $(window).width()
     if winHeight != savedHeight || winWidth != savedWidth
         console.log winHeight, winWidth
-        ctx.canvas.width = winWidth
-        ctx.canvas.height = winHeight
+        main.style.width = px(winWidth)
+        main.style.height = px(winHeight)
         main.width = winWidth * dpr
         main.height = winHeight * dpr
         drawText()
