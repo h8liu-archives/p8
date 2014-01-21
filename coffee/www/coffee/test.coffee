@@ -1,7 +1,7 @@
 px = (n) -> '' + n + 'px'
 
 main = $("#main")[0]
-logger = $("logger")[0]
+ref = $("#ref")
 dpr = window.devicePixelRatio
 ctx = main.getContext "2d"
 fontsize = 13
@@ -11,10 +11,8 @@ fontsize = 13
 
 drawText = (message) ->
     height = fontsize * dpr
-    ctx.scale dpr, dpr
     ctx.font = '' + height + 'px Consolas'
     width = ctx.measureText('M').width
-    ctx.fillText message, 0, height
     chars = message.split('')
     x = 0
     y = height
@@ -33,6 +31,7 @@ timer = ->
         console.log winHeight, winWidth
         main.style.width = px(winWidth)
         main.style.height = px(winHeight)
+        ctx.scale dpr, dpr
         main.width = winWidth * dpr
         main.height = winHeight * dpr
         m = '' + winWidth + 'x' + winHeight
