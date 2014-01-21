@@ -46,17 +46,16 @@ if false
 
     window.requestAnimationFrame(timer)
 
-startTimer = (f) ->
-    timer = (t) ->
+timer = (f) ->
+    repeat = (t) ->
         ret = f(t)
         if ret
-            window.requestAnimationFrame timer
-    window.requestAnimationFrame timer
+            window.requestAnimationFrame repeat
+    window.requestAnimationFrame repeat
     return
 
 Terminal = (canvas, _dpr) ->
     thiz = this
-    c = canvas
     px = (n) -> '' + n + 'px'
     ctx = canvas.getContext '2d'
     fontSize = 13
@@ -68,26 +67,34 @@ Terminal = (canvas, _dpr) ->
 
     this.resize = (w, h) ->
         if w == curWidth && h == curHeight
-            return
-        c.style.width = px(w)
-        c.style.height = px(h)
+            return false
+        canvas.style.width = px(w)
+        canvas.style.height = px(h)
         ctx.scale dpr, dpr
         canvas.width = w * dpr
         canvas.height = h * dpr
         charHeight = fontSize * dpr
+        ctx.font = '' + charHeight + 'px Consolas'
         charWidth = ctx.measureText('M').width
-        ctx.font = 'Consolas ' + charHeight + 'px'
-        return
+        curWidth = w
+        curHeight = h
+        return true
+
+    this.sizeStr = ->
+        return '' + curWidth + 'x' + curHeight
     
     this.fillWindow = (window) ->
         width = window.innerWidth
         height = window.innerHeight
-        thiz.resize(width, height)
-        return
+        return thiz.resize(width, height)
 
     this.putChar = (x, y, c) ->
         _x = x * charWidth
         _y = y * charHeight
+        if _x < 0 || _x + charWidth > curWidth
+            return
+        if _y < 0 || _y + charHeight > curHeight
+            return
         ctx.clearRect _x, _y, charWidth, charHeight
         ctx.fillText c, _x, _y + charHeight
 
@@ -95,7 +102,6 @@ Terminal = (canvas, _dpr) ->
         chars = msg.split('')
         x = 0
         y = 0
-        console.log charHeight
         ctx.font = '' + charHeight + 'px Consolas'
         ctx.fillStyle = "#c00" # red
         for c in chars
@@ -105,10 +111,9 @@ Terminal = (canvas, _dpr) ->
     
     return
 
-term = new Terminal $("#main")[0], window.devicePixelRatio
-startTimer ( -> 
-    term.fillWindow(window) 
-    term.print('hello')
+term = new Terminal($("#main")[0], window.devicePixelRatio)
+timer ->
+    if term.fillWindow(window)
+        term.print term.sizeStr()
     return true
-)
 
