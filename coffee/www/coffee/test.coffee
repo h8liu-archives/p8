@@ -16,6 +16,7 @@ drawText = (message) ->
     chars = message.split('')
     x = 0
     y = height
+    ctx.fillStyle = "#c00" # red
     for c in chars
         ctx.fillText c, x, y
         x += width
