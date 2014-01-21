@@ -1,4 +1,4 @@
-{ p8 } = require('../p8')
+{ p8 } = require('../src/p8')
 
 main = ->
     p = new p8.Page()

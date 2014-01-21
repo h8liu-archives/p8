@@ -2,4 +2,4 @@ test:
 	coffee tests/p8.coffee
 
 comp:
-	coffee -o _ -c .
+	coffee -j js/p8.js -c src/*.coffee
