@@ -12,7 +12,7 @@ main = ->
     vm = new p8.Vm()
     vm.mapPage p8.pageHead(1), p
     vm.pc = p8.pageHead 1
-    vm.ttl = 5
+    vm.ttl = 6
 
     e = vm.resume()
 
