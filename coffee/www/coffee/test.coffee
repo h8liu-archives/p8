@@ -18,6 +18,7 @@ drawText = (message) ->
     y = height
     ctx.fillStyle = "#c00" # red
     for c in chars
+        ctx.clearRect x, y - height, width, height
         ctx.fillText c, x, y
         x += width
 
@@ -35,8 +36,9 @@ timer = ->
         ctx.scale dpr, dpr
         main.width = winWidth * dpr
         main.height = winHeight * dpr
-        m = '' + winWidth + 'x' + winHeight
+        m = 'some ' + winWidth + 'x' + winHeight
         drawText(m)
+        drawText("res: ")
         savedHeight = winHeight
         savedWidth = winWidth
     window.requestAnimationFrame timer
