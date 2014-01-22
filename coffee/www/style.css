@@ -5,13 +5,20 @@ html {
 body {
     margin: 0;
     padding: 0;
-    text-align: center;
 }
+div.main {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    left: 0px;
+    text-align: center;
+    margin-top: -325px;
+}
+
 canvas {
-    display: inline-block;
-    margin: 26px;
+    margin: 5px;
     padding: 0;
-    background: #eee;
+    background: #f9f9f9;
     width: 560px;
     height: 650px;
 }

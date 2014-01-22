@@ -55,17 +55,21 @@ Terminal = (canvas, _dpr) ->
         x = 0
         y = 0
         ctx.font = '' + charHeight + 'px Consolas'
-        ctx.fillStyle = "#c00" # red
+        ctx.fillStyle = "#000" # red
         for c in chars
             thiz.putChar x, y, c
             x += 1
         return
 
-    this.resize canvas.width, canvas.height
+    this.resize 560, 650
     
     return
 
-term = new Terminal($("#main")[0], window.devicePixelRatio)
+leftTerm = new Terminal($("#left")[0], window.devicePixelRatio)
+rightTerm = new Terminal($("#right")[0], window.devicePixelRatio)
+leftTerm.print "hello, this is the left terminal."
+rightTerm.print "hello, this is the right terminal."
+
 # timer ->
 #     if term.fillWindow(window)
 #         term.print term.sizeStr()
