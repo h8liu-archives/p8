@@ -5,10 +5,13 @@ html {
 body {
     margin: 0;
     padding: 0;
+    text-align: center;
 }
-canvas#main {
-    display: block;
-    margin: 0;
+canvas {
+    display: inline-block;
+    margin: 26px;
     padding: 0;
-    background: #fff;
+    background: #eee;
+    width: 560px;
+    height: 650px;
 }

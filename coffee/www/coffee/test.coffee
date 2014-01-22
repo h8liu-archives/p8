@@ -108,12 +108,14 @@ Terminal = (canvas, _dpr) ->
             thiz.putChar x, y, c
             x += 1
         return
+
+    this.resize canvas.width, canvas.height
     
     return
 
 term = new Terminal($("#main")[0], window.devicePixelRatio)
-timer ->
-    if term.fillWindow(window)
-        term.print term.sizeStr()
-    return true
+# timer ->
+#     if term.fillWindow(window)
+#         term.print term.sizeStr()
+#     return true
 
