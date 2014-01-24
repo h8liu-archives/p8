@@ -13,12 +13,17 @@ Terminal = (canvas, _dpr) ->
     fontSize = 13
     charWidth = 0
     charHeight = 0
-    curWidth = 0
-    curHeight = 0
+    termWidth = 0
+    termHeight = 0
+    nchar = 0
+    nline = 0
+    
+    cursorX = 0
+    cursorY = 0
     dpr = _dpr
 
     this.resize = (w, h) ->
-        if w == curWidth && h == curHeight
+        if w == termWidth && h == termHeight
             return false
         canvas.style.width = px(w)
         canvas.style.height = px(h)
@@ -28,12 +33,16 @@ Terminal = (canvas, _dpr) ->
         charHeight = fontSize * dpr
         ctx.font = '' + charHeight + 'px Consolas'
         charWidth = ctx.measureText('M').width
-        curWidth = w
-        curHeight = h
+        termWidth = w
+        termHeight = h
+        nchar = Math.floor(w * dpr / charWidth)
+        nline = Math.floor(h * dpr / charHeight)
+        console.log nchar, nline
         return true
+    this.resize $(canvas).width(), $(canvas).height()
 
     this.sizeStr = ->
-        return '' + curWidth + 'x' + curHeight
+        return '' + termWidth + 'x' + termHeight
     
     this.fillWindow = (window) ->
         width = window.innerWidth
@@ -43,25 +52,21 @@ Terminal = (canvas, _dpr) ->
     this.putChar = (x, y, c) ->
         _x = x * charWidth
         _y = y * charHeight
-        if _x < 0 || _x + charWidth > curWidth
+        if _x < 0 || _x + charWidth > termWidth
             return
-        if _y < 0 || _y + charHeight > curHeight
+        if _y < 0 || _y + charHeight > termHeight
             return
         ctx.clearRect _x, _y, charWidth, charHeight
         ctx.fillText c, _x, _y + charHeight
 
     this.print = (msg) ->
         chars = msg.split('')
-        x = 0
-        y = 0
         ctx.font = '' + charHeight + 'px Consolas'
         ctx.fillStyle = "#000" # red
         for c in chars
-            thiz.putChar x, y, c
-            x += 1
+            thiz.putChar cursorX, cursorY, c
+            cursorX += 1
         return
-
-    this.resize 560, 650
     
     return
 
