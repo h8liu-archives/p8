@@ -54,7 +54,11 @@ rd
 
 // pipe capa
 
-0 syscall
+0 halt
+1 output  rx im
+2 outputp rx im
+2 input   rd im
+3 inputp  rd im
 
 1 add     rd = rx + ry
 2 sub     rd = rx - ry
