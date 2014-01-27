@@ -110,6 +110,7 @@ Risc = ->
 Vm = ->
     thiz = this
     pages = {}
+    readonlys = {}
     nreg = 8
     iregs = new Int32Array nreg
     uregs = new Uint32Array iregs
@@ -118,6 +119,14 @@ Vm = ->
 
     page = (a) ->
         id = pageId(a)
+        if id of pages then return pages[id]
+        e = errAddr
+        return fakePage
+    wpage = (a) ->
+        id = pageId(a)
+        if id of readonlys
+            e = errAddr
+            return fakePage
         if id of pages then return pages[id]
         e = errAddr
         return fakePage
@@ -134,13 +143,13 @@ Vm = ->
     u32 = (a) -> c32 a; page(a).u32(pageOff a)
     f64 = (a) -> c64 a; page(a).f64(pageOff a)
     
-    pi8 = (a, v) -> page(a).pi8(pageOff a)
-    pu8 = (a, v) -> page(a).pu8(pageOff a)
-    pi16 = (a, v) -> c16 a; page(a).pi16(pageOff a, v)
-    pu16 = (a, v) -> c16 a; page(a).pu16(pageOff a, v)
-    pi32 = (a, v) -> c32 a; page(a).pi32(pageOff a, v)
-    pu32 = (a, v) -> c32 a; page(a).pu32(pageOff a, v)
-    pf64 = (a, v) -> c64 a; page(a).pf64(pageOff a, v)
+    pi8 = (a, v) -> wpage(a).pi8(pageOff a)
+    pu8 = (a, v) -> wpage(a).pu8(pageOff a)
+    pi16 = (a, v) -> c16 a; wpage(a).pi16(pageOff a, v)
+    pu16 = (a, v) -> c16 a; wpage(a).pu16(pageOff a, v)
+    pi32 = (a, v) -> c32 a; wpage(a).pi32(pageOff a, v)
+    pu32 = (a, v) -> c32 a; wpage(a).pu32(pageOff a, v)
+    pf64 = (a, v) -> c64 a; wpage(a).pf64(pageOff a, v)
 
     risc = new Risc()
     execs = {}
@@ -191,10 +200,11 @@ Vm = ->
     this.pc = pageHead 1
     this.ttl = 0
     this.tsc = 0
-    this.mapPage = (a, p) ->
+    this.mapPage = (a, p, ro) ->
         id = pageId a
         if id == 0 then return
-        pages[pageId a] = p
+        pages[id] = p
+        if ro then readonlys[id] = true
         return
     this.resume = -> e = 0; step() while e == 0; e
     this.step = -> e = 0; step(); e

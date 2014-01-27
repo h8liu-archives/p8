@@ -10,7 +10,7 @@ main = ->
     asm.label "so"
 
     vm = new p8.Vm()
-    vm.mapPage p8.pageHead(1), p
+    vm.mapPage p8.pageHead(1), p, true # read only
     vm.pc = p8.pageHead 1
     vm.ttl = 6
 
