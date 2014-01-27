@@ -1,0 +1,41 @@
+** Lonely Project **
+
+This is more like a lonely and useless project. It aims to build a virtual
+machine that no one would probably use in the end.
+
+The virtual machine would work in the browser. So the main code would be
+javascript.
+
+I think I plan to build it mostly all from scratch.
+
+Why from scratch? First, I don't really have any pressure on the construction
+speed, it's not a time driven project. If it takes too long time to build, it
+won't hurt. Second, I would like to have the confident at the end of project,
+or at any time of building this thing, to say that, I understand how each piece
+works. If I just port some modern tools in, I won't be able to say that.
+
+Javascript will be used for building the simple bootstrap tools, the virtual
+machine engine and the simple user interface. The plan is after the virtual
+machine is stable, I would be mainly working inside a VM for developing, using
+tools that I built by my own.
+
+I would probably need to re-learn and re-think a lot of stuff, like parsing,
+compiling, language design, interface design, operating system design, and so
+on.
+
+** History **
+
+I have written a simple VM in golang before this. However, the go version is
+more like just prototyping the idea. Once I move to javascript, I changed
+the RISC to a 32bit integer one, because javascript natively only supports 32bit
+well. And since the final goal is to write the VM in javascript so that it could
+be accessed by anyone easily, there is no point to write the VM in golang here.
+
+Coffeescript makes javascript much easy to use, but I still love golang. The hope
+is that after the virtual environment is built up, I can start design my own 
+golang-like language in the virtual environment and play with that.
+
+** Bootstrap **
+
+To bootstrap the development, I need to first build some tools for testing the
+virtual machine.
