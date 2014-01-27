@@ -15,6 +15,7 @@ a16 = (p) -> p >> 1 << 1
 a32 = (p) -> p >> 2 << 2
 a64 = (p) -> p >> 3 << 3
 
+# A page of pageSize
 Page = ->
     buffer = new ArrayBuffer(pageSize)
     view = new DataView(buffer)
@@ -37,6 +38,8 @@ Page = ->
 
     return # Page
 
+# A page that has the same interface but does nothing
+# on either writing or reading
 NoopPage = ->
     r0 = (p) -> 0
     noop = (p, v) -> return
@@ -48,7 +51,10 @@ NoopPage = ->
 
     return # NoopPage
 
-Asm = ->
+# A organic structure that stores all the opcodes
+# It supports querying, instruction parsing, instruction making
+# and instruction printing functions
+Risc = ->
     thiz = this
     byname = {}
     bycode = {}
@@ -99,7 +105,7 @@ Asm = ->
         if name of byname then byname[name] else false
     this.names = names
     
-    return # Asm
+    return # Risc
 
 Vm = ->
     thiz = this
@@ -136,11 +142,11 @@ Vm = ->
     pu32 = (a, v) -> c32 a; page(a).pu32(pageOff a, v)
     pf64 = (a, v) -> c64 a; page(a).pf64(pageOff a, v)
 
-    asm = new Asm()
+    risc = new Risc()
     execs = {}
     strs = {}
     o = (name, exec) ->
-        ret = asm.byname name
+        ret = risc.byname name
         if ret == false then return
         code = ret.code
         execs[code] = exec
@@ -197,6 +203,7 @@ Vm = ->
 
     return # Vm
 
+# A page writer that writes into a page.
 PageWriter = (page) ->
     p = page
     thiz = this
@@ -212,29 +219,30 @@ PageWriter = (page) ->
 
     return # PageWriter
 
+# A very simple assembler that writes instructions in a page
 PageAsm = (page) ->
     p = page
     writer = new PageWriter(page)
     thiz = this
-    asm = new Asm()
+    risc = new Risc()
     labels = {}
 
-    for name in asm.names
+    for name in risc.names
         thiz[name] = (a, b, c, d, e) ->
-            writer.u32(asm[name](a, b, c, d, e))
+            writer.u32(risc[name](a, b, c, d, e))
 
     this.label = (lab) ->
         console.log lab, writer.off
         labels[lab] = writer.off
         return
 
-    return
+    return # PageAsm
 
 exports.p8 =
     errHalt: errHalt
     errAddr: errAddr
     errDeath: errDeath
-    Asm: Asm
+    Risc: Risc
     Vm: Vm
     PageWriter: PageWriter
     PageAsm: PageAsm
